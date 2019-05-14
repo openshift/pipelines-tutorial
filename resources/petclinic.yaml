@@ -1,0 +1,123 @@
+---
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  labels:
+    app: spring-petclinic
+  name: spring-petclinic
+---
+apiVersion: apps.openshift.io/v1
+kind: DeploymentConfig
+metadata:
+  labels:
+    app: spring-petclinic
+  name: spring-petclinic
+spec:
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    app: spring-petclinic
+    deploymentconfig: spring-petclinic
+  strategy:
+    activeDeadlineSeconds: 21600
+    resources: {}
+    rollingParams:
+      intervalSeconds: 1
+      maxSurge: 25%
+      maxUnavailable: 25%
+      timeoutSeconds: 600
+      updatePeriodSeconds: 1
+    type: Rolling
+  template:
+    metadata:
+      labels:
+        app: spring-petclinic
+        deploymentconfig: spring-petclinic
+    spec:
+      containers:
+      - image: spring-petclinic:latest
+        imagePullPolicy: Always
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /
+            port: 8080
+            scheme: HTTP
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
+        name: spring-petclinic
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+        - containerPort: 8443
+          protocol: TCP
+        - containerPort: 8778
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /
+            port: 8080
+            scheme: HTTP
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+  test: false
+  triggers:
+  - imageChangeParams:
+      containerNames:
+      - spring-petclinic
+      from:
+        kind: ImageStreamTag
+        name: spring-petclinic:latest
+        namespace: pipelines-tutorial
+    type: ImageChange
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: spring-petclinic
+  name: spring-petclinic
+spec:
+  ports:
+  - name: 8080-tcp
+    port: 8080
+    protocol: TCP
+    targetPort: 8080
+  - name: 8443-tcp
+    port: 8443
+    protocol: TCP
+    targetPort: 8443
+  - name: 8778-tcp
+    port: 8778
+    protocol: TCP
+    targetPort: 8778
+  selector:
+    app: spring-petclinic
+    deploymentconfig: spring-petclinic
+  sessionAffinity: None
+  type: ClusterIP
+---  
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  labels:
+    app: spring-petclinic
+  name: spring-petclinic
+spec:
+  port:
+    targetPort: 8080-tcp
+  to:
+    kind: Service
+    name: spring-petclinic
+    weight: 100
