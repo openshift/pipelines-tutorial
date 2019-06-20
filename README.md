@@ -28,6 +28,8 @@ In this tutorial you will:
 
 You need an OpenShift 4 cluster in order to complete this tutorial. If you don't have an existing cluster, go to http://try.openshift.com and register for free in order to get an OpenShift 4 cluster up and running on AWS within minutes.
 
+You will also use the Tekton CLI through out this tutorial. Download [Tekton CLI](https://github.com/tektoncd/cli/releases/latest) and copy it to a location on your `PATH`.
+
 
 ## Concepts
 
@@ -187,7 +189,7 @@ You might have noticed that there are no references to the PetClinic Git reposit
 
 The tasks execution order is determined based on the dependencies that are defined between the tasks via `inputs` and `outputs`, as well as explicit orders that are defined via `runAfter`.
 
-Save the pipeline definition in a file and then create it using `oc create -f`. Alternatively, in the OpenShift Console you can click on **Add &#8594; Import YAML** at the top right of the screen, paste the YAML into the textfield, and click on **Create**.
+Save the pipeline definition in a file and then create it using `oc create -f`. Alternatively, in the OpenShift Console you can click on **Add &#8594; Import YAML** at the top right of the screen while you are in the **pipelines-tutorial** project, paste the YAML into the textfield, and click on **Create**. 
 
 ![OpenShift Console - Import Yaml](images/console-import-yaml-1.png)
 
@@ -273,7 +275,7 @@ petclinic-deploy-pipelinerun-lkq7d   7 minutes ago   3 minutes   Succeeded
 Check the pipelinerun logs as it executes:
 
 ```
-$ tkn pr logs petclinic-deploy-pipelinerun-lkq7d
+$ tkn pr logs petclinic-deploy-pipelinerun-lkq7d -f
 ...
 
 [s2i-java-8 : nop] Build successful
