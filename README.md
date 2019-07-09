@@ -1,6 +1,6 @@
 # OpenShift Pipelines Tutorial
 
-Welcome to OpenShift Pipelines tutorial!
+Welcome to the OpenShift Pipelines tutorial!
 
 OpenShift Pipelines is a cloud-native, continuous integration and delivery (CI/CD) solution for building pipelines using [Tekton](https://tekton.dev). Tekton is a flexible, Kubernetes-native, open-source CI/CD framework that enables automating deployments across multiple platforms (Kubernetes, serverless, VMs, etc) by abstracting away the underlying details.
 
@@ -28,16 +28,16 @@ In this tutorial you will:
 
 You need an OpenShift 4 cluster in order to complete this tutorial. If you don't have an existing cluster, go to http://try.openshift.com and register for free in order to get an OpenShift 4 cluster up and running on AWS within minutes.
 
-You will also use the Tekton CLI (`tkn`) through out this tutorial. Download [Tekton CLI](https://github.com/tektoncd/cli/releases/latest) and copy it to a location on your `PATH`.
+You will also use the Tekton CLI (`tkn`) through out this tutorial. Download the [Tekton CLI](https://github.com/tektoncd/cli#getting-started) and copy it to a location on your `PATH`.
 
 ## Concepts
 
 Tekton defines a number of [Kubernetes custom resources](https://kubernetes.io/docs/concepts/extend-kubernetes/api-extension/custom-resources/) as building blocks in order to standardize pipeline concepts and provide a terminology that is consistent across CI/CD solutions. These custom resources (CR) are an extension of Kubernetes that let users create and interact with these objects using `kubectl` and other Kubernetes tools.
 
 The custom resources needed to define a pipeline are:
-* `Task`: a reusable loosely-coupled number of steps that perform a specific task e.g building a container image
+* `Task`: a reusable, loosely coupled number of steps that perform a specific task (e.g., building a container image)
 * `Pipeline`: the definition of the pipeline and the `Task`s that it should perform
-* `PipelineResource`: inputs (e.g. git repository) and outputs (image registry) to and out of a pipeline or task
+* `PipelineResource`: inputs (e.g., git repository) and outputs (e.g., image registry) to and out of a pipeline or task
 * `TaskRun`: the result of running an instance of task
 * `PipelineRun`: the result of running an instance of pipeline, which includes a number of `TaskRun`s
 
@@ -66,7 +66,7 @@ Create a project for the sample application that you will be using in this tutor
 oc new-project pipelines-tutorial
 ```
 
-Building container images using build tools such as `S2I`, `Buildah`, `Kaniko`, etc require privileged access to the cluster. OpenShift default security setting does not allow privileged containers unless specifically configured. Create a service account for running pipelines and enable it to run privileged pods for building images:
+Building container images using build tools such as `S2I`, `Buildah`, `Kaniko`, etc require privileged access to the cluster. OpenShift default security settings do not allow privileged containers unless specifically configured. Create a service account for running pipelines and enable it to run privileged pods for building images:
 
 ```
 oc create serviceaccount pipeline
@@ -112,7 +112,7 @@ spec:
     - install
 ```
 
-When a `task` starts running, it starts a pod and runs each `step` sequentially in a separate container on the same pod. This task happens to have a single step, but tasks can have multiple steps, and, since they run within the same pod, they have access to the same volumes in order to cache files, access configmaps, secrets, etc. `Task`s can also receive inputs (e.g. a git repository) and outputs (e.g. an image in a registry) in order to interact with each other.
+When a `task` starts running, it starts a pod and runs each `step` sequentially in a separate container on the same pod. This task happens to have a single step, but tasks can have multiple steps, and, since they run within the same pod, they have access to the same volumes in order to cache files, access configmaps, secrets, etc. `Task`s can also receive inputs (e.g., a git repository) and outputs (e.g., an image in a registry) in order to interact with each other.
 
 Note that only the requirement for a git repository is declared on the task and not a specific git repository to be used. That allows `task`s to be reusable for multiple pipelines and purposes. You can find more examples of reusable `task`s in the [Tekton Catalog](https://github.com/tektoncd/catalog) and [OpenShift Catalog](https://github.com/openshift/pipelines-catalog) repositories.
 
@@ -186,9 +186,15 @@ This pipeline performs the following:
 
 You might have noticed that there are no references to the PetClinic Git repository and its image in the registry. That's because `Pipeline`s in Tekton are designed to be generic and re-usable across environments and stages through the application's lifecycle. `Pipeline`s abstract away the specifics of the Git source repository and image to be produced as `resource`s. When triggering a pipeline, you can provide different Git repositories and image registries to be used during pipeline execution. Be patient! You will do that in a little bit in the next section.
 
-The tasks execution order is determined based on the dependencies that are defined between the tasks via `inputs` and `outputs` as well as explicit orders that are defined via `runAfter`.
+The execution order of `task`s is determined by dependencies that are defined between the `task`s via `inputs` and `outputs` as well as explicit orders that are defined via `runAfter`.
 
-Save the pipeline definition as a `.yaml` file and then create it using `oc create -f YOUR_FILE_NAME.yaml`. Alternatively, in the OpenShift console, you can click on **Add &#8594; Import YAML** at the top right of the screen while you are in the **pipelines-tutorial** project, paste the YAML into the textfield, and click on **Create**.
+Create the pipeline by running the following:
+
+```bash
+oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/master/resources/deploy-pipeline.yaml
+```
+
+Alternatively, in the OpenShift web console, you can click on **Add &#8594; Import YAML** at the top right of the screen while you are in the **pipelines-tutorial** project, paste the YAML into the textfield, and click on **Create**.
 
 ![OpenShift Console - Import Yaml](images/console-import-yaml-1.png)
 
@@ -200,7 +206,7 @@ Check the list of pipelines you have created using the CLI:
 ```
 $ tkn pipeline ls
 NAME             AGE              LAST RUN   STARTED   DURATION   STATUS
-build-pipeline   25 seconds ago   ---        ---       ---        ---
+deploy-pipeline  25 seconds ago   ---        ---       ---        ---
 ```
 
 ## Trigger Pipeline
@@ -237,7 +243,11 @@ spec:
     value: image-registry.openshift-image-registry.svc:5000/pipelines-tutorial/spring-petclinic
 ```
 
-Create the above pipeline resources via the OpenShift web console or save them in a file and use `oc create -f`.
+Create the above pipeline resources via the OpenShift web console or by running the following:
+
+```bash
+oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/master/resources/petclinic-resources.yaml
+```
 
 A `PipelineRun` is how you can trigger a pipeline and tie it to the Git and image resources that should be used for this specific invocation:
 
@@ -261,9 +271,13 @@ spec:
       name: petclinic-image
 ```
 
-Create the above pipeline resources via the OpenShift web console or save them in a file and use `oc create -f`.
+Trigger the `Pipeline` to deploy the Spring PetClinic app by entering the `PipelineRun` YAML definition above into the web console or run the command below:
 
-The pipeline would then get instantiated and create a number of pods to execute the tasks that are defined in the pipeline. After a few minutes, the pipeline should finish successfully.
+```bash
+oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/master/resources/petclinic-deploy-pipelinerun.yaml
+```
+
+The pipeline is then instantiated and pods are created to execute the tasks that are defined in the pipeline. After a few minutes, the pipeline should finish successfully.
 
 ```
 # tkn pr ls
