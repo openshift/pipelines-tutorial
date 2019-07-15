@@ -1,0 +1,43 @@
+= Deleting the Project and Uninstalling the OpenShift Pipelines Operator
+
+== Deleting the Project
+
+== Procedure
+
+. In the OpenShift Web Console, navigate to **Home > Projects** . 
+
+. Select the `pipelines` project, on the listed page. 
+
+. Right click the menu icon on the `pipelines` row.
+
+. Select **Delete Project**.
+
+. Confirm deletion by typing **pipelines** in the field that appears. 
+
+. Click **Delete**.
+
+. The project is now deleted from the **Projects** list and cluster.
+
+
+
+
+== Uninstalling the Knative Serving Operator
+
+== Procedure
+
+. Go to **Catalog > OperatorHub** in the Web Console. 
+
+. Click on the **OpenShift Pipelines Operator** tile. 
+
++
+NOTE: The operator tile will indicate it is installed.
+ 
+. The **Show Community Operator**` dialog box will appear. Click **Continue** to proceed.
+
+. Once, the **OpenShift Pipelines Operator** descriptor screen appears, click **Uninstall**.
+
+. Select **Also completely remove the Operator from the selected namespace**, in the **Remove Operator Subscription** dialog box 
+
+.Click **Remove**.
+
+

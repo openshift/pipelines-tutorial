@@ -1,0 +1,24 @@
+:parent-context-of-using-openshift-pipelines: {context}
+
+[id='using-openshift-pipelines_{context}']
+= Using OpenShift Pipelines
+
+:context: using-openshift-pipelines
+
+The following section demonstrates how to trigger and run pipelines as well as to check on the application status.
+
+include::proc_deploying-an-application-to-openshift.adoc[leveloffset=+1]
+
+include::proc_defining-and-creating-pipeline-tasks.adoc[leveloffset=+1]
+
+include::proc_defining-and-creating-pipelineresources.adoc[leveloffset=+1]
+
+include::proc_assembling-a-pipeline.adoc[leveloffset=+1]
+
+include::proc_triggering-and-running-a-pipeline.adoc[leveloffset=+1]
+
+include::proc_checking-pipeline-and-application-status.adoc[leveloffset=+1]
+
+
+
+:context: {parent-context-of-using-openshift-pipelines}

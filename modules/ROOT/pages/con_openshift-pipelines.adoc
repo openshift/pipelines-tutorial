@@ -1,0 +1,18 @@
+[id="openshift-pipelines_{context}"]
+= OpenShift Pipelines
+
+OpenShift Pipelines are cloud-native, continuous integration and delivery solutions based on Kubernetes resources. It uses Tekton Pipelines to automate deployments across multiple platforms. Tekton introduces a number of standard Custom Resource Definitions (CRDs) for defining pipelines that are portable across Kubernetes distributions.
+
+*Key Features:*
+
+* Designed for microservices and decentralized teams
+* Standard CI/CD pipelines definition that is easy to extend and integrate with existing tools, enabling you to scale on-demand
+* Build images with Kubernetes tools such as Source-to-Image (S2I), Buildah, Buildpacks and Kaniko
+* Deploy applications to multiple platforms such as Kubernetes, Serverless, and Virtual Machines (VMs) and are portable across any Kubernetes platform
+
+
+[discrete]
+== Additional resources
+
+* For more details on defining pipelines, see the link:https://kubernetes.io/docs/concepts/extend-kubernetes/api-extension/custom-resources/[Custom Resources documentation] .
+* For more information on Tekton see the link:https://github.com/tektoncd[Tekton Pipelines documentation].

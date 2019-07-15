@@ -1,0 +1,60 @@
+// Ths module is included in the following assembly:
+//
+// assembly_using-openshift-pipelines.adoc
+
+
+[id="triggering-and-running-a-pipeline_{context}"]
+= Triggering and running a pipeline
+
+`PipelineRuns` are used to manually trigger a `Pipeline` and tie it to the Git and image resources that should be used for the specific invocation.
+
+[discrete]
+== Procedure
+
+. Copy the contents of the following sample `PipelineRun` YAML file and save it.
++
+----
+apiVersion: tekton.dev/v1alpha1
+kind: PipelineRun
+metadata:
+  generateName: petclinic-deploy-pipelinerun-
+spec:
+  pipelineRef:
+    name: deploy-pipeline
+  trigger:
+    type: manual
+  serviceAccount: 'pipeline'
+  resources:
+  - name: app-git
+    resourceRef:
+      name: petclinic-git
+  - name: app-image
+    resourceRef:
+      name: petclinic-image
+----
+
+. Create the `PipelineRun` by using the following command:
++
+----
+oc create -f petclinic-deploy-pipelinerun-.yaml
+----
++
+Creating a `PipelineRun` automatically creates and triggers the `TaskRuns` for each `Task` in your `Pipeline`. It instantiates the `Pipeline` and creates a number of pods to execute the tasks that are defined in the `Pipeline`.
+
+. After a few minutes, verify that the `Pipeline` ran successfully by listing all the `PipelineRuns` as follows:
++
+----
+$ tkn pr ls
+NAME                                 STARTED         DURATION    STATUS
+petclinic-deploy-pipelinerun-lkq7d   7 minutes ago   3 minutes   Succeeded
+----
+
+////
+
+[discrete]
+== Additional resources
+
+* A bulleted list of links to other material closely related to the contents of the procedure module.
+* For more details on writing procedure modules, see the link:https://github.com/redhat-documentation/modular-docs#modular-documentation-reference-guide[Modular Documentation Reference Guide].
+* Use a consistent system for file names, IDs, and titles. For tips, see _Anchor Names and File Names_ in link:https://github.com/redhat-documentation/modular-docs#modular-documentation-reference-guide[Modular Documentation Reference Guide].
+////

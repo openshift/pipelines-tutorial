@@ -1,0 +1,48 @@
+// Ths module is included in the following assembly:
+//
+// assembly_creating-openshift-pipelines.adoc
+
+[id="deploying-an-application-to-openshift_{context}"]
+= Deploying an application to OpenShift
+
+[discrete]
+== Prerequisites
+
+* You have installed link:proc_installing-openshift-pipelines-operator.html[OpenShift Pipelines] using the OpenShift Pipeline Operator listed in the OpenShift OperatorHub. Once installed, it is applicable to the entire cluster.
+* You have installed the link:https://github.com/tektoncd/cli[Tekton CLI]
+
+[discrete]
+== Procedure
+
+. Create a project for the sample application:
++
+----
+oc new-project pipelines-tutorial
+----
+
+. Building container images using build tools such as S2I, Buildah, or Kaniko, require privileged containers to access the cluster. The default security settings in OpenShift do not allow privileged containers. Create a service account for running `Pipeline` s and enable it to run privileged pods for building container images:
++
+----
+oc create serviceaccount pipeline
+oc adm policy add-scc-to-user privileged -z pipeline
+oc adm policy add-role-to-user edit -z pipeline
+----
+
+. Create the Kubernetes objects for deploying the PetClinic application on OpenShift:
++
+----
+oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/master/resources/petclinic.yaml
+----
+
+. Navigate to *Home* -> *Projects* -> *Status* in the OpenShift Web Console to verify the deployment. The deployment at this stage is not complete. The `Pipeline` you create in the next steps builds the container images for the PetClinic application and completes the deployment.
++
+image::initiate_deployment.png[Initiate deployment]
+
+////
+[discrete]
+== Additional resources
+
+*
+*
+*
+////

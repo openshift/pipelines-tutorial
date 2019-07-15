@@ -1,0 +1,3 @@
+uglify -s index.js -o min.js
+browserify min.js -s Nick -o lib/nick.js
+rm min.js
