@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pipelines concepts :: OpenShift Pipelines</title>
+    <link rel="canonical" href="https://openshift.github.io/pipelines-tutorial/docs/con_openshift-pipeline-concepts.html">
+    <meta name="generator" content="Antora 2.0.0">
+    <link rel="stylesheet" href="../_/css/site.css">
+  </head>
+  <body class="article">
+<header class="header">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="https://openshift.github.io/pipelines-tutorial">OpenShift Pipelines</a>
+      <button class="navbar-burger" data-target="topbar-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+<!--
+    <div id="topbar-nav" class="navbar-menu">
+      <div class="navbar-end">
+        <a class="navbar-item" href="#">Home</a>
+        <div class="navbar-item has-dropdown is-hoverable">
+          <a class="navbar-link" href="#">Products</a>
+          <div class="navbar-dropdown">
+            <a class="navbar-item" href="#">Product A</a>
+            <a class="navbar-item" href="#">Product B</a>
+            <a class="navbar-item" href="#">Product C</a>
+          </div>
+        </div>
+        <div class="navbar-item has-dropdown is-hoverable">
+          <a class="navbar-link" href="#">Services</a>
+          <div class="navbar-dropdown">
+            <a class="navbar-item" href="#">Service A</a>
+            <a class="navbar-item" href="#">Service B</a>
+            <a class="navbar-item" href="#">Service C</a>
+          </div>
+        </div>
+        <div class="navbar-item has-dropdown is-hoverable">
+          <a class="navbar-link" href="#">Resources</a>
+          <div class="navbar-dropdown">
+            <a class="navbar-item" href="#">Resource A</a>
+            <a class="navbar-item" href="#">Resource B</a>
+            <a class="navbar-item" href="#">Resource C</a>
+          </div>
+        </div>
+        <div class="navbar-item">
+          <span class="control">
+            <a class="button is-primary" href="#">Download</a>
+          </span>
+        </div>
+      </div>
+-->
+    </div>
+  </nav>
+</header>
+<div class="main-wrapper">
+  <div class="navigation-container" data-component="docs" data-version="master">
+  <aside class="navigation">
+    <div class="panels">
+<div class="navigation-menu is-active" data-panel="menu">
+  <nav class="nav-menu">
+    <h3 class="title"><a href="index.html">OpenShift Pipelines</a></h3>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-toggle"></button>
+    <a class="nav-link" href="assembly_understanding-openshift-pipelines.html">1. Understanding OpenShift Pipelines</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="con_openshift-pipelines.html">What is OpenShift Pipelines?</a>
+  </li>
+  <li class="nav-item is-current-page" data-depth="2">
+    <a class="nav-link" href="con_openshift-pipeline-concepts.html">Operator Concepts</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-toggle"></button>
+    <a class="nav-link" href="assembly_installing-openshift-pipelines.html">2. Installation</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="proc_installing-openshift-pipelines-operator.html">Operator Installation</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="proc_creating-custom-resources-for-openshift-pipelines-operator.html">Creating Custom Resources</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-toggle"></button>
+    <a class="nav-link" href="assembly_using-openshift-pipelines.html">3. Using Pipelines</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="proc_deploying-an-application-to-openshift.html">Deploying an Application to OpenShift</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="proc_defining-and-creating-pipeline-tasks.html">Defining and Creating Pipeline Tasks</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="proc_defining-and-creating-pipelineresources.html">Defining and Creating Pipeline Resources</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="proc_assembling-a-pipeline.html">Assembling a Pipeline</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="proc_triggering-and-running-a-pipeline.html">Triggering and Running a Pipeline</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="proc_checking-pipeline-and-application-status.html">Checking Pipeline and Application Status</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+</ul>
+  </nav>
+</div>
+<div class="navigation-explore" data-panel="explore">
+  <div class="context">
+    <span class="title">OpenShift Pipelines</span>
+    <span class="version">master</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <span class="title">OpenShift Pipelines</span>
+      <ul class="versions">
+        <li class="version is-current is-latest">
+          <a href="index.html">master</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+  <div class="main-view-and-toolbar">
+    <div class="toolbar" role="navigation">
+  <button class="navigation-toggle"></button>
+  <a href="index.html" class="home-link"></a>
+<nav class="crumbs" aria-label="breadcrumbs">
+  <ul>
+    <li class="crumb"><a href="index.html">OpenShift Pipelines</a></li>
+    <li class="crumb"><a href="assembly_understanding-openshift-pipelines.html">1. Understanding OpenShift Pipelines</a></li>
+    <li class="crumb"><a href="con_openshift-pipeline-concepts.html">Operator Concepts</a></li>
+  </ul>
+</nav>
+  <!--
+  <div class="edit-this-page"><a href="file:///home/joaedwar/pipelines-tutorial/modules/ROOT/pages/con_openshift-pipeline-concepts.adoc">Edit this Page</a></div>
+  -->
+</div>
+    <div class="main-view-and-toc">
+        <main class="main">
+          <article class="doc">
+<h1>Pipelines concepts</h1>
+<div class="paragraph">
+<p>The Custom Resource Definitions (CRDs) provided by OpenShift Pipelines include: <code>Task</code>,<code>Pipeline</code>,<code>PipelineRun</code>, <code>TaskRun</code>, and <code>PipelineResources</code>.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>A <code>Task</code> is the smallest configurable unit in a <code>Pipeline</code> and is essentially a function of inputs and outputs that inform the <code>Pipeline</code> build. It can run individually or as a part of a <code>Pipeline</code>. A <code>Pipeline</code> includes one or more <code>Tasks</code>, with a <code>Task</code> consisting of one or more steps. Steps are a series of commands that are sequentially executed by the <code>Task</code>.</p>
+</li>
+<li>
+<p>A <code>Pipeline</code> is a series of <code>Tasks</code> that are executed to build complex workflows that automate the build, deployment and delivery of applications. It is a collection of <code>PipelineResources</code>,<code>Parameters</code>, and one or more <code>Tasks</code>. A <code>Pipeline</code> interacts with the outside world, by using <code>PipelineResources</code>, which are given to <code>Tasks</code> as inputs and outputs.</p>
+</li>
+<li>
+<p>A <code>PipelineRun</code> is used to run and manage the execution of the <code>Pipeline</code>. <code>PipelineRun</code> initiates the creation of a <code>TaskRun</code> for each <code>Task</code> being executed in the <code>Pipeline</code>.</p>
+</li>
+<li>
+<p><code>TaskRun</code> is auto-created by a <code>PipelineRun</code> for each <code>Task</code> in a <code>Pipeline</code> and  results from running an instance of a <code>Task</code>. It can also be manually created if a <code>Task</code> runs outside of a <code>Pipeline</code>.</p>
+</li>
+<li>
+<p><code>PipelineResources</code> are objects that are used as inputs and outputs for pipeline <code>Tasks</code>. For example, if an input is a Git repository and an output is a container image built from that Git repository, these are both classified as <code>PipelineResources</code>. <code>PipelineResources</code> currently support Git Resources, Image Resources, Cluster Resources, and Storage Resources.</p>
+</li>
+</ul>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/tekton_architecture.png" alt="tekton architecture">
+</div>
+</div>
+<div class="ulist">
+<div class="title">Additional information</div>
+<ul>
+<li>
+<p>For more information on pipeline concepts, see the <a href="https://github.com/tektoncd/pipeline/tree/master/docs#learn-more">Tekton documentation</a>.</p>
+</li>
+</ul>
+</div>
+</article>
+        </main>
+            </div>
+  </div>
+</div><footer class="footer">
+  <p>Adapted from Antora default UI, (c) 2019</p>
+</footer>
+<script src="../_/js/site.js"></script>
+<script src="../_/js/vendor/highlight.js"></script>
+<script>hljs.initHighlighting()</script>
+  </body>
+</html>
