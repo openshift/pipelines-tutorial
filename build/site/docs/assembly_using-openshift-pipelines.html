@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Using OpenShift Pipelines :: OpenShift Pipelines</title>
+    <link rel="canonical" href="https://openshift.github.io/pipelines-tutorial/docs/assembly_using-openshift-pipelines.html">
+    <meta name="generator" content="Antora 2.0.0">
+    <link rel="stylesheet" href="../_/css/site.css">
+  </head>
+  <body class="article">
+<header class="header">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="https://openshift.github.io/pipelines-tutorial">OpenShift Pipelines</a>
+      <button class="navbar-burger" data-target="topbar-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+<!--
+    <div id="topbar-nav" class="navbar-menu">
+      <div class="navbar-end">
+        <a class="navbar-item" href="#">Home</a>
+        <div class="navbar-item has-dropdown is-hoverable">
+          <a class="navbar-link" href="#">Products</a>
+          <div class="navbar-dropdown">
+            <a class="navbar-item" href="#">Product A</a>
+            <a class="navbar-item" href="#">Product B</a>
+            <a class="navbar-item" href="#">Product C</a>
+          </div>
+        </div>
+        <div class="navbar-item has-dropdown is-hoverable">
+          <a class="navbar-link" href="#">Services</a>
+          <div class="navbar-dropdown">
+            <a class="navbar-item" href="#">Service A</a>
+            <a class="navbar-item" href="#">Service B</a>
+            <a class="navbar-item" href="#">Service C</a>
+          </div>
+        </div>
+        <div class="navbar-item has-dropdown is-hoverable">
+          <a class="navbar-link" href="#">Resources</a>
+          <div class="navbar-dropdown">
+            <a class="navbar-item" href="#">Resource A</a>
+            <a class="navbar-item" href="#">Resource B</a>
+            <a class="navbar-item" href="#">Resource C</a>
+          </div>
+        </div>
+        <div class="navbar-item">
+          <span class="control">
+            <a class="button is-primary" href="#">Download</a>
+          </span>
+        </div>
+      </div>
+-->
+    </div>
+  </nav>
+</header>
+<div class="main-wrapper">
+  <div class="navigation-container" data-component="docs" data-version="master">
+  <aside class="navigation">
+    <div class="panels">
+<div class="navigation-menu is-active" data-panel="menu">
+  <nav class="nav-menu">
+    <h3 class="title"><a href="index.html">OpenShift Pipelines</a></h3>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-toggle"></button>
+    <a class="nav-link" href="assembly_understanding-openshift-pipelines.html">1. Understanding OpenShift Pipelines</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="con_openshift-pipelines.html">What is OpenShift Pipelines?</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="con_openshift-pipeline-concepts.html">Operator Concepts</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-toggle"></button>
+    <a class="nav-link" href="assembly_installing-openshift-pipelines.html">2. Installation</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="proc_installing-openshift-pipelines-operator.html">Operator Installation</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="proc_creating-custom-resources-for-openshift-pipelines-operator.html">Creating Custom Resources</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item is-current-page" data-depth="1">
+    <button class="nav-toggle"></button>
+    <a class="nav-link" href="assembly_using-openshift-pipelines.html">3. Using Pipelines</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="proc_deploying-an-application-to-openshift.html">Deploying an Application to OpenShift</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="proc_defining-and-creating-pipeline-tasks.html">Defining and Creating Pipeline Tasks</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="proc_defining-and-creating-pipelineresources.html">Defining and Creating Pipeline Resources</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="proc_assembling-a-pipeline.html">Assembling a Pipeline</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="proc_triggering-and-running-a-pipeline.html">Triggering and Running a Pipeline</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="proc_checking-pipeline-and-application-status.html">Checking Pipeline and Application Status</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+</ul>
+  </nav>
+</div>
+<div class="navigation-explore" data-panel="explore">
+  <div class="context">
+    <span class="title">OpenShift Pipelines</span>
+    <span class="version">master</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <span class="title">OpenShift Pipelines</span>
+      <ul class="versions">
+        <li class="version is-current is-latest">
+          <a href="index.html">master</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+  <div class="main-view-and-toolbar">
+    <div class="toolbar" role="navigation">
+  <button class="navigation-toggle"></button>
+  <a href="index.html" class="home-link"></a>
+<nav class="crumbs" aria-label="breadcrumbs">
+  <ul>
+    <li class="crumb"><a href="index.html">OpenShift Pipelines</a></li>
+    <li class="crumb"><a href="assembly_using-openshift-pipelines.html">3. Using Pipelines</a></li>
+  </ul>
+</nav>
+  <!--
+  <div class="edit-this-page"><a href="file:///home/joaedwar/pipelines-tutorial/modules/ROOT/pages/assembly_using-openshift-pipelines.adoc">Edit this Page</a></div>
+  -->
+</div>
+    <div class="main-view-and-toc">
+        <main class="main">
+          <article class="doc">
+<h1>Using OpenShift Pipelines</h1>
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>The following section demonstrates how to trigger and run pipelines as well as to check on the application status.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="deploying-an-application-to-openshift_using-openshift-pipelines"><a class="anchor" href="#deploying-an-application-to-openshift_using-openshift-pipelines"></a>Deploying an application to OpenShift</h2>
+<div class="sectionbody">
+<h3 id="_prerequisites" class="discrete">Prerequisites</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>You have installed <a href="proc_installing-openshift-pipelines-operator.html">OpenShift Pipelines</a> using the OpenShift Pipeline Operator listed in the OpenShift OperatorHub. Once installed, it is applicable to the entire cluster.</p>
+</li>
+<li>
+<p>You have installed the <a href="https://github.com/tektoncd/cli">Tekton CLI</a></p>
+</li>
+</ul>
+</div>
+<h3 id="_procedure" class="discrete">Procedure</h3>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Create a project for the sample application:</p>
+<div class="listingblock">
+<div class="content">
+<pre>oc new-project pipelines-tutorial</pre>
+</div>
+</div>
+</li>
+<li>
+<p>Building container images using build tools such as S2I, Buildah, or Kaniko, require privileged containers to access the cluster. The default security settings in OpenShift do not allow privileged containers. Create a service account for running <code>Pipeline</code> s and enable it to run privileged pods for building container images:</p>
+<div class="listingblock">
+<div class="content">
+<pre>oc create serviceaccount pipeline
+oc adm policy add-scc-to-user privileged -z pipeline
+oc adm policy add-role-to-user edit -z pipeline</pre>
+</div>
+</div>
+</li>
+<li>
+<p>Create the Kubernetes objects for deploying the PetClinic application on OpenShift:</p>
+<div class="listingblock">
+<div class="content">
+<pre>oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/master/resources/petclinic.yaml</pre>
+</div>
+</div>
+</li>
+<li>
+<p>Navigate to <strong>Home</strong> &#8594; <strong>Projects</strong> &#8594; <strong>Status</strong> in the OpenShift Web Console to verify the deployment. The deployment at this stage is not complete. The <code>Pipeline</code> you create in the next steps builds the container images for the PetClinic application and completes the deployment.</p>
+<div class="imageblock">
+<div class="content">
+<img src="_images/initiate_deployment.png" alt="Initiate deployment">
+</div>
+</div>
+</li>
+</ol>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="defining-and-creating-pipeline-tasks_using-openshift-pipelines"><a class="anchor" href="#defining-and-creating-pipeline-tasks_using-openshift-pipelines"></a>Defining and creating pipeline tasks</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><code>Tasks</code> are the building blocks of a <code>Pipeline</code> and consist of sequentially executed steps. <code>steps</code> are a series of commands that achieve a specific goal, for instance, build an image.</p>
+</div>
+<div class="paragraph">
+<p>Every <code>Task</code> runs as a pod and each <code>step</code> runs in its own container within the same pod. Since they run within the same pod they have access to the same volumes to cache files, configmaps, and secrets. They use <code>inputs</code> parameters, for example, a git , and <code>outputs</code> parameters, for example, an image in a registry, to interact with other tasks.</p>
+</div>
+<div class="paragraph">
+<p><code>Tasks</code> are reusable and can be used in multiple <code>Pipeline</code> s. For this tutorial, you create a Maven <code>Task</code> with a single step to build a Maven based application, and then add two reusable <code>Tasks</code> from the <a href="https://github.com/tektoncd/catalog">catalog</a> repository.</p>
+</div>
+<h3 id="_procedure_2" class="discrete">Procedure</h3>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>To create the Maven <code>Task</code>:</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>Copy the contents of the following sample <code>Task</code> YAML file and save it:</p>
+<div class="listingblock">
+<div class="content">
+<pre>apiVersion: tekton.dev/v1alpha1
+kind: Task
+metadata:
+  name: maven-build
+spec:
+  inputs:
+    resources:
+    - name: workspace-git
+      targetPath: /
+      type: git
+  steps:
+  - name: build
+    image: maven:3.6.0-jdk-8-slim
+    command:
+    - /usr/bin/mvn
+    args:
+    - install</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This <code>Task</code> starts a pod and runs a container inside that pod using the <code>maven:3.6.0-jdk-8-slim</code> image to run the specified commands. It receives an input directory called <code>workspace-git</code> which contains the source code of the application.</p>
+</div>
+<div class="paragraph">
+<p>Only the requirement for a git repository is declared on the <code>Task</code> and not a specific git repository to be used. This allows <code>Tasks</code> to be reusable for multiple <code>Pipeline</code> s and purposes.</p>
+</div>
+</li>
+<li>
+<p>Create the <code>Task</code> within your project:</p>
+<div class="listingblock">
+<div class="content">
+<pre>oc create -f maven-build-task.yaml</pre>
+</div>
+</div>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>Install the <code>s2i</code> and <code>openshift-cli</code> reusable <code>Tasks</code> from the <a href="https://github.com/tektoncd/catalog">catalog repository</a>, which contains a list of reusable <code>Tasks</code> for <code>Pipeline</code> s:</p>
+<div class="listingblock">
+<div class="content">
+<pre>$ oc create -f https://raw.githubusercontent.com/tektoncd/catalog/master/openshift-client/openshift-client-task.yaml
+$ oc create -f https://raw.githubusercontent.com/openshift/pipelines-catalog/master/s2i-java8/s2i-java-8-task.yaml</pre>
+</div>
+</div>
+</li>
+<li>
+<p>Verify the <code>Tasks</code> added to the <code>Pipeline</code> as follows:</p>
+<div class="listingblock">
+<div class="content">
+<pre>$ tkn task ls
+
+NAME              AGE
+maven-build       23 secs ago
+openshift-client  10 secs ago
+s2i-java          11 secs ago</pre>
+</div>
+</div>
+</li>
+</ol>
+</div>
+<h3 id="_additional_resources" class="discrete">Additional resources</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>For more examples of reusable <code>Tasks</code> see the <a href="https://github.com/tektoncd/catalog">Tekton Catalog</a> and <a href="https://github.com/openshift/pipelines-catalog">OpenShift Catalog</a> repositories.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="defining-and-creating-pipelineresources_using-openshift-pipelines"><a class="anchor" href="#defining-and-creating-pipelineresources_using-openshift-pipelines"></a>Defining and creating pipeline resources</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><code>PipelineResources</code> are artifacts that are used as inputs to a <code>Task</code> and can be output by a <code>Task</code>.</p>
+</div>
+<h3 id="_procedure_3" class="discrete">Procedure</h3>
+<div class="paragraph">
+<p>After you create <code>Task</code> s, create <code>PipelineResources</code> that contain the specifics of the Git repository and the image registry to be used in the <code>Pipeline</code> during execution as follows:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Copy the content of the following sample <code>PipelineResource</code> YAML file that defines the Git repository and reference for the PetClinic application and save it.</p>
+<div class="listingblock">
+<div class="content">
+<pre>apiVersion: tekton.dev/v1alpha1
+kind: PipelineResource
+metadata:
+  name: petclinic-git
+spec:
+  type: git
+  params:
+  - name: url
+    value: https://github.com/spring-projects/spring-petclinic</pre>
+</div>
+</div>
+</li>
+<li>
+<p>Create the petclininc-git <code>PipelineResource</code>:</p>
+<div class="listingblock">
+<div class="content">
+<pre>oc create -f petclininc-git.yaml</pre>
+</div>
+</div>
+</li>
+<li>
+<p>Copy the content of the following sample <code>PipelineResource</code> YAML file that defines the OpenShift internal registry to which you want to push the PetClinic image and save it.</p>
+<div class="listingblock">
+<div class="content">
+<pre>apiVersion: tekton.dev/v1alpha1
+kind: PipelineResource
+metadata:
+  name: petclinic-image
+spec:
+  type: image
+  params:
+  - name: url
+    value: image-registry.openshift-image-registry.svc:5000/pipelines-tutorial/spring-petclinic
+Create the petclinic-image pipelineresource:
+oc create -f petclininc-git.yaml</pre>
+</div>
+</div>
+</li>
+<li>
+<p>Create the petclininc-image <code>PipelineResource</code>:</p>
+<div class="listingblock">
+<div class="content">
+<pre>oc create -f petclininc-image.yaml</pre>
+</div>
+</div>
+</li>
+</ol>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="assembling-a-pipeline_using-openshift-pipelines"><a class="anchor" href="#assembling-a-pipeline_using-openshift-pipelines"></a>Assembling a pipeline</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>A <code>Pipeline</code> represents a CI/CD flow and is defined by the <code>Tasks</code> to be executed.  It specifies how the <code>Tasks</code> interact with each other and their order of execution using the <code>inputs</code> , <code>outputs</code>, and the <code>run-After</code> parameters. It is designed to be generic and reusable in multiple applications and environments.</p>
+</div>
+<div class="paragraph">
+<p>For this tutorial, create a <code>Pipeline</code> that takes the source code of the Spring PetClinic application from GitHub, builds the application, and deploys it on OpenShift as outlined below:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/pipeline.png" alt="Pipeline">
+</div>
+</div>
+<h3 id="_procedure_4" class="discrete">Procedure</h3>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Copy the contents of the following sample <code>Pipeline</code> YAML file and save it:</p>
+<div class="listingblock">
+<div class="content">
+<pre>apiVersion: tekton.dev/v1alpha1
+kind: Pipeline
+metadata:
+  name: deploy-pipeline
+spec:
+  resources:
+  - name: app-git
+    type: git
+  - name: app-image
+    type: image
+  tasks:
+  - name: build
+    taskRef:
+      name: s2i-java-8
+    params:
+      - name: TLSVERIFY
+        value: "false"
+    resources:
+      inputs:
+      - name: source
+        resource: app-git
+      outputs:
+      - name: image
+        resource: app-image
+  - name: deploy
+    taskRef:
+      name: openshift-client
+    runAfter:
+      - build
+    params:
+    - name: ARGS
+      value: "rollout latest spring-petclinic"</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This <code>Pipeline</code> performs the following tasks:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Clones the source code of the application from a Git repository (app-git resource).</p>
+</li>
+<li>
+<p>Builds the container image using the S2I task which generates a Dockerfile for the application and uses Buildah to build an image.</p>
+</li>
+<li>
+<p>The application image is then pushed to an image registry (app-image resource).</p>
+</li>
+<li>
+<p>The new application image is deployed on OpenShift using the OpenShift-CLI.</p>
+<div class="paragraph">
+<p>Note that, the <code>Pipeline</code> YAML file contains no references to the PetClinic Git repository and its image in the registry. These are defined in the <code>PipelineResources</code>.</p>
+</div>
+<div class="paragraph">
+<p><code>Pipeline</code> s in Tekton are designed to be generic and re-usable across environments and stages through the applications lifecycle. They abstract away the specifics of the Git source repository and image registries to be used during <code>Pipeline</code> execution.</p>
+</div>
+<div class="paragraph">
+<p>The tasks execution order is determined based on the dependencies that are defined between the tasks using the  <code>inputs</code> and <code>outputs</code> parameters, and the explicit orders that are defined using <code>runAfter</code>.</p>
+</div>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>Create the <code>Pipeline</code>:</p>
+<div class="listingblock">
+<div class="content">
+<pre>oc create -f deploy-pipeline.yaml</pre>
+</div>
+</div>
+</li>
+<li>
+<p>Verify that the <code>Pipeline</code> has been added to the application as follows:</p>
+<div class="listingblock">
+<div class="content">
+<pre>$ tkn pipeline ls
+NAME             AGE             LAST RUN   STARTED   DURATION   STATUS
+build-pipeline   8 seconds ago   ---        ---       ---        ---</pre>
+</div>
+</div>
+</li>
+</ol>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="triggering-and-running-a-pipeline_using-openshift-pipelines"><a class="anchor" href="#triggering-and-running-a-pipeline_using-openshift-pipelines"></a>Triggering and running a pipeline</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><code>PipelineRuns</code> are used to manually trigger a <code>Pipeline</code> and tie it to the Git and image resources that should be used for the specific invocation.</p>
+</div>
+<h3 id="_procedure_5" class="discrete">Procedure</h3>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Copy the contents of the following sample <code>PipelineRun</code> YAML file and save it.</p>
+<div class="listingblock">
+<div class="content">
+<pre>apiVersion: tekton.dev/v1alpha1
+kind: PipelineRun
+metadata:
+  generateName: petclinic-deploy-pipelinerun-
+spec:
+  pipelineRef:
+    name: deploy-pipeline
+  trigger:
+    type: manual
+  serviceAccount: 'pipeline'
+  resources:
+  - name: app-git
+    resourceRef:
+      name: petclinic-git
+  - name: app-image
+    resourceRef:
+      name: petclinic-image</pre>
+</div>
+</div>
+</li>
+<li>
+<p>Create the <code>PipelineRun</code> by using the following command:</p>
+<div class="listingblock">
+<div class="content">
+<pre>oc create -f petclinic-deploy-pipelinerun-.yaml</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Creating a <code>PipelineRun</code> automatically creates and triggers the <code>TaskRuns</code> for each <code>Task</code> in your <code>Pipeline</code>. It instantiates the <code>Pipeline</code> and creates a number of pods to execute the tasks that are defined in the <code>Pipeline</code>.</p>
+</div>
+</li>
+<li>
+<p>After a few minutes, verify that the <code>Pipeline</code> ran successfully by listing all the <code>PipelineRuns</code> as follows:</p>
+<div class="listingblock">
+<div class="content">
+<pre>$ tkn pr ls
+NAME                                 STARTED         DURATION    STATUS
+petclinic-deploy-pipelinerun-lkq7d   7 minutes ago   3 minutes   Succeeded</pre>
+</div>
+</div>
+</li>
+</ol>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="checking-pipeline-and-application-status_using-openshift-pipelines"><a class="anchor" href="#checking-pipeline-and-application-status_using-openshift-pipelines"></a>Checking pipeline and application status</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>You can examine the logs for <code>PipelineRuns</code> to verify its status.</p>
+</div>
+<h3 id="_procedure_6" class="discrete">Procedure</h3>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Check the <code>PipelineRun</code> logs as follows:</p>
+<div class="listingblock">
+<div class="content">
+<pre>$ tkn pr logs petclinic-deploy-pipelinerun-lkq7d
+...
+
+[s2i-java-8 : nop] Build successful
+
+[openshift-client : oc] deploymentconfig.apps.openshift.io/spring-petclinic rolled out
+
+[openshift-client : nop] Build successful</pre>
+</div>
+</div>
+</li>
+<li>
+<p>Check the <strong>Project Status</strong> in the OpenShift Web Console to verify that the PetClinic image is successfully built and deployed.</p>
+<div class="imageblock">
+<div class="content">
+<img src="_images/deployment_complete.png" alt="Application deployed on OpenShift">
+</div>
+</div>
+</li>
+</ol>
+</div>
+</div>
+</div>
+</article>
+        </main>
+            </div>
+  </div>
+</div><footer class="footer">
+  <p>Adapted from Antora default UI, (c) 2019</p>
+</footer>
+<script src="../_/js/site.js"></script>
+<script src="../_/js/vendor/highlight.js"></script>
+<script>hljs.initHighlighting()</script>
+  </body>
+</html>
