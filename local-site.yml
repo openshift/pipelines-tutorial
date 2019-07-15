@@ -1,6 +1,6 @@
 site:
   title: OpenShift Pipelines
-  url: https://openshift.github.io/pipelines-tutorial/
+  url: https://openshift.github.io/pipelines-docs/
   start_page: docs::index
 content:
   sources:
