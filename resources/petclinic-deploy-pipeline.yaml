@@ -1,7 +1,7 @@
 apiVersion: tekton.dev/v1alpha1
 kind: Pipeline
 metadata:
-  name: deploy-pipeline
+  name: petclinic-deploy-pipeline
 spec:
   resources:
   - name: app-git
