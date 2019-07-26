@@ -4,7 +4,7 @@ metadata:
   generateName: petclinic-deploy-pipelinerun-
 spec:
   pipelineRef:
-    name: deploy-pipeline
+    name: petclinic-deploy-pipeline
   trigger:
     type: manual
   serviceAccount: 'pipeline'
