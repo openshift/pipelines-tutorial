@@ -1,0 +1,95 @@
+#!/usr/bin/env bash
+set -e -u -o pipefail
+
+declare -r SCRIPT_PATH=$(readlink -f "$0")
+declare -r SCRIPT_DIR=$(cd $(dirname "$SCRIPT_PATH") && pwd)
+
+must_exist() {
+  local path="$1"; shift
+  [[ -r "$path" ]] || {
+    echo "Missing file $path"
+    exit 1
+  }
+  return 0
+}
+
+_log() {
+    local level=$1; shift
+    echo -e "$level: $@"
+}
+
+log.err() {
+    _log "ERROR" "$@" >&2
+}
+
+err() {
+    local code=$1; shift
+    local msg="$@"; shift
+    log.err $msg
+    exit $code
+}
+
+log.debug() {
+    _log DEBUG "$@"
+}
+
+
+valid_command() {
+  local fn=$1; shift
+  [[ $(type -t "$fn") == "function" ]]
+}
+
+execute() {
+  echo "Running:  '$@'"
+  ${DRY_RUN:-false} || "$@"
+}
+
+demo.prep() {
+  oc get ns -o name | grep -q namespace/pipelines-tutorial || {
+    oc new-project pipelines-tutorial
+  }
+  oc create serviceaccount pipeline
+  oc adm policy add-scc-to-user privileged -z pipeline
+  oc adm policy add-role-to-user edit -z pipeline
+}
+
+TEKTON_CATALOG="https://raw.githubusercontent.com/tektoncd/catalog/master"
+OPENSHIFT_CATALOG="https://raw.githubusercontent.com/openshift/pipelines-catalog/master"
+
+
+demo.setup() {
+  oc apply -f resources/petclinic.yaml
+
+  oc apply -f "$TEKTON_CATALOG/openshift-client/openshift-client-task.yaml"
+  oc apply -f "$OPENSHIFT_CATALOG/s2i-java-8/s2i-java-8-task.yaml"
+  oc apply -f resources/petclinic-resources.yaml
+  oc apply -f resources/petclinic-deploy-pipeline.yaml
+  tkn p ls
+}
+
+demo.logs() {
+  tkn pipeline logs petclinic-deploy-pipeline -l -f
+}
+
+demo.run() {
+  tkn pipeline start petclinic-deploy-pipeline \
+    -r app-git=petclinic-git \
+    -r app-image=petclinic-image \
+    -s pipeline
+
+  sleep 5
+  demo.logs
+}
+
+
+main() {
+  local fn="demo.${1:-''}"
+  valid_command "$fn" || err  1 "invalid sub command $1"
+  shift
+
+  cd $SCRIPT_DIR
+  $fn "$@"
+  return $?
+}
+
+main "$@"
