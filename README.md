@@ -45,7 +45,7 @@ The custom resources needed to define a pipeline are:
 
 In short, in order to create a pipeline, one does the following:
 * Create custom or install [existing](https://github.com/tektoncd/catalog) reusable `Tasks`
-* Create a `Pipeline` and `PipelneResource`s to define your application's delivery pipeline
+* Create a `Pipeline` and `PipelineResource`s to define your application's delivery pipeline
 * Create a `PipelineRun` to instantiate and invoke the pipeline
 
 For further details on pipeline concepts, refer to the [Tekton documentation](https://github.com/tektoncd/pipeline/tree/master/docs#learn-more) that provides an excellent guide for understanding various parameters and attributes available for defining pipelines.
