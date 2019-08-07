@@ -277,17 +277,17 @@ The `-r` flag specifies the `PipelineResource`s that should be provided to the p
 As soon as you started the `petclinic-deploy-pipeline` pipeline, a pipelinerun is instantiated and pods are created to execute the tasks that are defined in the pipeline. 
 
 ```bash
-$ tkn pr list 
-
-NAME                                  STARTED          DURATION   STATUS    
-petclinic-deploy-pipeline-run-q62p8   57 seconds ago   ---        Running
+$ tkn pipeline list
+NAME                        AGE             LAST RUN                              STARTED         DURATION   STATUS
+petclinic-deploy-pipeline   23 seconds ago   petclinic-deploy-pipeline-run-tsv92  23 seconds ago   ---        Running
 ```
 
-Check out the logs of the pipelinerun as it runs using the following CLI command:
+Check out the logs of the pipelinerun as it runs using the `tkn pipeline logs` command which interactively allows you to pick the pipelinerun of your interest and inspect the logs:
 
 ```
-$ tkn pr logs petclinic-deploy-pipeline-run-q62p8 -f
-
+$ tkn pipeline logs -f                                                                                             
+? Select pipeline : petclinic-deploy-pipeline
+? Select pipelinerun : petclinic-deploy-pipeline-run-tsv92 started 39 seconds ago
 
 ...
 [build : nop] Build successful
@@ -301,9 +301,17 @@ After a few minutes, the pipeline would finish successfully.
 $ tkn pipeline list 
 
 NAME                        AGE             LAST RUN                              STARTED         DURATION    STATUS
-petclinic-deploy-pipeline   7 minutes ago   petclinic-deploy-pipeline-run-q62p8   5 minutes ago   4 minutes   Succeeded
+petclinic-deploy-pipeline   7 minutes ago   petclinic-deploy-pipeline-run-tsv92   5 minutes ago   4 minutes   Succeeded
 ```
 
 Looking back at the project, you should see that the PetClinic image is successfully built and deployed.
 
 ![PetClinic Deployed](images/petclinic-deployed-2.png)
+
+
+If you want to re-run the pipeline again, you can use the following short-hand command to rerun the last pipelinerun again, using 
+the same pipeline resources and service account used in the previous pipeline:
+
+```
+tkn pipeline start petclinic-deploy-pipeline --last
+```
