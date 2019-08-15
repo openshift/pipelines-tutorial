@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
 set -e -u -o pipefail
 
-declare -r SCRIPT_PATH=$(readlink -f "$0")
-declare -r SCRIPT_DIR=$(cd $(dirname "$SCRIPT_PATH") && pwd)
+declare -r SCRIPT_DIR=$(cd -P $(dirname $0) && pwd)
 
 must_exist() {
   local path="$1"; shift
@@ -81,11 +80,24 @@ demo.run() {
   demo.logs
 }
 
+demo.help() {
+  cat <<-EOF
+USAGE: 
+ demo [command]
+
+COMMANDS:
+ prep           creates project and service account
+ setup          creates tasks, pipeline and resources
+ run            starts pipeline
+
+EOF
+
+}
+
 
 main() {
-  local fn="demo.${1:-''}"
-  valid_command "$fn" || err  1 "invalid sub command $1"
-  shift
+  local fn="demo.${1:-help}"
+  valid_command "$fn" || err  1 "invalid command $1"
 
   cd $SCRIPT_DIR
   $fn "$@"
