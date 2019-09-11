@@ -17,8 +17,13 @@ _log() {
     echo -e "$level: $@"
 }
 
+
 log.err() {
     _log "ERROR" "$@" >&2
+}
+
+info() {
+    _log "\nINFO" "$@"
 }
 
 err() {
@@ -52,18 +57,42 @@ demo.prep() {
   oc adm policy add-role-to-user edit -z pipeline
 }
 
-TEKTON_CATALOG="https://raw.githubusercontent.com/tektoncd/catalog/master"
-OPENSHIFT_CATALOG="https://raw.githubusercontent.com/openshift/pipelines-catalog/master"
+declare -r TEKTON_CATALOG="https://raw.githubusercontent.com/tektoncd/catalog/master"
+declare -r OPENSHIFT_CATALOG="https://raw.githubusercontent.com/openshift/pipelines-catalog/master"
+declare -r TASKS_DIR=tmp/tasks
+
+declare -r OC_TASK="$TEKTON_CATALOG/openshift-client/openshift-client-task.yaml"
+declare -r LOCAL_OC_TASK="$TASKS_DIR/oc.task.yaml"
+
+declare -r S2I_JAVA8_TASK="$OPENSHIFT_CATALOG/s2i-java-8/s2i-java-8-task.yaml"
+declare -r LOCAL_S2I_JAVA8_TASK="$TASKS_DIR/s2i-java8.task.yaml"
+
+demo.get-tasks() {
+  echo Downloading tasks from catalog into $TASKS_DIR directory
+  mkdir -p "$TASKS_DIR"
+  curl -sLf  "$S2I_JAVA8_TASK" -o "$LOCAL_S2I_JAVA8_TASK"
+  curl -sLf  "$OC_TASK" -o "$LOCAL_OC_TASK"
+}
 
 
 demo.setup() {
+  demo.get-tasks
+
+  info "Apply petclinic resources"
   oc apply -f resources/petclinic.yaml
 
-  oc apply -f "$TEKTON_CATALOG/openshift-client/openshift-client-task.yaml"
-  oc apply -f "$OPENSHIFT_CATALOG/s2i-java-8/s2i-java-8-task.yaml"
+  info "Apply pipeline tasks"
+  oc apply -f "$TASKS_DIR"
+
+  info "Applying resources"
   oc apply -f resources/petclinic-resources.yaml
+
+  info "Applying pipeline"
   oc apply -f resources/petclinic-deploy-pipeline.yaml
-  tkn p ls
+
+  echo -e "\nPipeline"
+  echo "==============="
+  tkn p desc petclinic-deploy-pipeline
 }
 
 demo.logs() {
@@ -82,14 +111,13 @@ demo.run() {
 
 demo.help() {
   cat <<-EOF
-USAGE: 
- demo [command]
+		USAGE:
+		  demo [command]
 
-COMMANDS:
- prep           creates project and service account
- setup          creates tasks, pipeline and resources
- run            starts pipeline
-
+		COMMANDS:
+		  prep      creates project and service account
+		  setup     creates tasks, pipeline and resources
+		  run       starts pipeline
 EOF
 
 }
@@ -97,7 +125,10 @@ EOF
 
 main() {
   local fn="demo.${1:-help}"
-  valid_command "$fn" || err  1 "invalid command $1"
+  valid_command "$fn" || {
+    demo.help
+    err  1 "invalid command '$1'"
+  }
 
   cd $SCRIPT_DIR
   $fn "$@"
