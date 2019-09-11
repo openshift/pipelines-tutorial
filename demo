@@ -56,7 +56,8 @@ demo.prep() {
   oc get ns "$NAMESPACE" 2>/dev/null  || {
     oc new-project $NAMESPACE
   }
-  OC create serviceaccount pipeline
+
+  OC get sa pipeline || OC create serviceaccount pipeline
   OC adm policy add-scc-to-user privileged -z pipeline
   OC adm policy add-role-to-user edit -z pipeline
 }
