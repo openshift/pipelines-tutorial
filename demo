@@ -36,30 +36,23 @@ execute() {
   ${DRY_RUN:-false} || "$@"
 }
 
-#mask oc and tkn to use the $NAMESPACE
+# helpers to avoid adding -n $NAMESPACE to oc and tkn
 OC() {
+  echo oc -n ${NAMESPACE} "$@"
   oc -n ${NAMESPACE} "$@"
 }
 
 TKN() {
+ echo tkn -n ${NAMESPACE} "$@"
  tkn -n ${NAMESPACE} "$@"
 }
 
 demo.validate() {
+  info "validating tools"
+
   tkn version >/dev/null 2>&1 || err 1 "no tkn binary found"
   oc version >/dev/null 2>&1 || err 1 "no oc binary found"
   return 0
-}
-
-demo.prep() {
-  demo.validate
-  oc get ns "$NAMESPACE" 2>/dev/null  || {
-    oc new-project $NAMESPACE
-  }
-
-  OC get sa pipeline || OC create serviceaccount pipeline
-  OC adm policy add-scc-to-user privileged -z pipeline
-  OC adm policy add-role-to-user edit -z pipeline
 }
 
 declare -r TEKTON_CATALOG="https://raw.githubusercontent.com/tektoncd/catalog/master"
@@ -73,7 +66,7 @@ declare -r S2I_JAVA8_TASK="$OPENSHIFT_CATALOG/s2i-java-8/s2i-java-8-task.yaml"
 declare -r LOCAL_S2I_JAVA8_TASK="$TASKS_DIR/s2i-java8.task.yaml"
 
 demo.get-tasks() {
-  echo Downloading tasks from catalog into $TASKS_DIR directory
+  info "Downloading tasks from catalog to $TASKS_DIR directory"
   mkdir -p "$TASKS_DIR"
   curl -sLf  "$S2I_JAVA8_TASK" -o "$LOCAL_S2I_JAVA8_TASK"
   curl -sLf  "$OC_TASK" -o "$LOCAL_OC_TASK"
@@ -81,6 +74,19 @@ demo.get-tasks() {
 
 
 demo.setup() {
+  demo.validate
+
+
+  info "ensure namespace $NAMESPACE exists"
+  OC get ns "$NAMESPACE" 2>/dev/null  || {
+    OC new-project $NAMESPACE
+  }
+
+  info "setup required service accounts"
+  OC get sa pipeline || OC create serviceaccount pipeline
+  OC adm policy add-scc-to-user privileged -z pipeline
+  OC adm policy add-role-to-user edit -z pipeline
+
   demo.get-tasks
 
   info "Apply petclinic resources"
@@ -120,9 +126,9 @@ demo.help() {
 		  demo [command]
 
 		COMMANDS:
-		  prep      creates project and service account
-		  setup     creates tasks, pipeline and resources
+		  setup     setups project, tasks, pipeline and resources
 		  run       starts pipeline
+		  logs      show logs of last pipelinerun
 EOF
 
 }
