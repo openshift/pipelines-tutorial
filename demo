@@ -90,13 +90,16 @@ demo.setup() {
   demo.get-tasks
 
   info "Apply petclinic resources"
-  OC apply -f resources/petclinic.yaml
+
+  sed -e "s|pipelines-tutorial|$NAMESPACE|g" resources/petclinic.yaml |
+    OC apply -f -
 
   info "Apply pipeline tasks"
   OC apply -f "$TASKS_DIR"
 
   info "Applying resources"
-  OC apply -f resources/petclinic-resources.yaml
+  sed -e "s|pipelines-tutorial|$NAMESPACE|g" \
+    resources/petclinic-resources.yaml | OC apply -f -
 
   info "Applying pipeline"
   OC apply -f resources/petclinic-deploy-pipeline.yaml
