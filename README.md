@@ -66,12 +66,13 @@ Create a project for the sample application that you will be using in this tutor
 $ oc new-project pipelines-tutorial
 ```
 
-Building container images using build tools such as S2I, Buildah, Kaniko, etc require privileged access to the cluster. OpenShift default security settings do not allow privileged containers unless specifically configured. Create a service account for running pipelines and enable it to run privileged pods for building images:
+OpenShift pipelines automatically adds and configures a `serviceaccount` -
+`pipeline` which has sufficient permissions to build and push an image. This
+serviceaccount will be used later in the tutorial
 
-```
-$ oc create serviceaccount pipeline
-$ oc adm policy add-scc-to-user privileged -z pipeline
-$ oc adm policy add-role-to-user edit -z pipeline
+
+```bash
+$ oc get serviceaccount   # should list pipeline
 ```
 
 You will use the [Spring PetClinic](https://github.com/spring-projects/spring-petclinic) sample application during this tutorial, which is a simple Spring Boot application.
@@ -272,9 +273,9 @@ $ tkn pipeline start petclinic-deploy-pipeline \
 Pipelinerun started: petclinic-deploy-pipeline-run-q62p8
 ```
 
-The `-r` flag specifies the `PipelineResource`s that should be provided to the pipeline and the `-s` flag specifies the service account to be used for running the pipeline. 
+The `-r` flag specifies the `PipelineResource`s that should be provided to the pipeline and the `-s` flag specifies the service account to be used for running the pipeline.
 
-As soon as you started the `petclinic-deploy-pipeline` pipeline, a pipelinerun is instantiated and pods are created to execute the tasks that are defined in the pipeline. 
+As soon as you start the `petclinic-deploy-pipeline` pipeline, a pipelinerun will be instantiated and pods will be created to execute the tasks that are defined in the pipeline.
 
 ```bash
 $ tkn pipeline list
@@ -285,7 +286,7 @@ petclinic-deploy-pipeline   23 seconds ago   petclinic-deploy-pipeline-run-tsv92
 Check out the logs of the pipelinerun as it runs using the `tkn pipeline logs` command which interactively allows you to pick the pipelinerun of your interest and inspect the logs:
 
 ```
-$ tkn pipeline logs -f                                                                                             
+$ tkn pipeline logs -f
 ? Select pipeline : petclinic-deploy-pipeline
 ? Select pipelinerun : petclinic-deploy-pipeline-run-tsv92 started 39 seconds ago
 
@@ -298,7 +299,7 @@ $ tkn pipeline logs -f
 After a few minutes, the pipeline would finish successfully.
 
 ```bash
-$ tkn pipeline list 
+$ tkn pipeline list
 
 NAME                        AGE             LAST RUN                              STARTED         DURATION    STATUS
 petclinic-deploy-pipeline   7 minutes ago   petclinic-deploy-pipeline-run-tsv92   5 minutes ago   4 minutes   Succeeded
@@ -309,7 +310,7 @@ Looking back at the project, you should see that the PetClinic image is successf
 ![PetClinic Deployed](images/petclinic-deployed-2.png)
 
 
-If you want to re-run the pipeline again, you can use the following short-hand command to rerun the last pipelinerun again, using 
+If you want to re-run the pipeline again, you can use the following short-hand command to rerun the last pipelinerun again, using
 the same pipeline resources and service account used in the previous pipeline:
 
 ```
