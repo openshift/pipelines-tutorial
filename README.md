@@ -80,7 +80,7 @@ You will use the [Spring PetClinic](https://github.com/spring-projects/spring-pe
 Create the Kubernetes objects for deploying the PetClinic app on OpenShift. The deployment will not complete since there are no container images built for the PetClinic application yet. That you will do in the following sections through a CI/CD pipeline:
 
 ```bash
-$ oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/master/resources/petclinic.yaml
+$ oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/master/petclinic/manifests.yaml
 ```
 
 You should be able to see the deployment in the OpenShift Web Console.
@@ -181,22 +181,35 @@ spec:
 ```
 
 This pipeline performs the following:
-1. Clones the source code of the application from a Git repository (`app-git` resource)
-3. Builds the container image using the `s2i-java-8` task that generates a Dockerfile for the application and uses [Buildah](https://buildah.io/) to build the image
-4. The application image is pushed to an image registry (`app-image` resource)
-5. The new application image is deployed on OpenShift using the `openshift-cli`
+1. Clones the source code of the application from a Git repository (`app-git`
+   resource)
+1. Builds the container image using the `s2i-java-8` task that generates a
+   Dockerfile for the application and uses [Buildah](https://buildah.io/) to
+   build the image
+1. The application image is pushed to an image registry (`app-image` resource)
+1. The new application image is deployed on OpenShift using the `openshift-cli`
 
-You might have noticed that there are no references to the PetClinic Git repository and its image in the registry. That's because `Pipeline`s in Tekton are designed to be generic and re-usable across environments and stages through the application's lifecycle. `Pipeline`s abstract away the specifics of the Git source repository and image to be produced as `resource`s. When triggering a pipeline, you can provide different Git repositories and image registries to be used during pipeline execution. Be patient! You will do that in a little bit in the next section.
+You might have noticed that there are no references to the PetClinic Git
+repository and its image in the registry. That's because `Pipeline`s in Tekton
+are designed to be generic and re-usable across environments and stages through
+the application's lifecycle. `Pipeline`s abstract away the specifics of the Git
+source repository and image to be produced as `resource`s. When triggering a
+pipeline, you can provide different Git repositories and image registries to be
+used during pipeline execution. Be patient! You will do that in a little bit in
+the next section.
 
 The execution order of `task`s is determined by dependencies that are defined between the `task`s via `inputs` and `outputs` as well as explicit orders that are defined via `runAfter`.
 
 Create the pipeline by running the following:
 
 ```bash
-$ oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/master/resources/petclinic-deploy-pipeline.yaml
+$ oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/master/pipeline/01-build-deploy.yaml
 ```
 
-Alternatively, in the OpenShift web console, you can click on **Add &#8594; Import YAML** at the top right of the screen while you are in the **pipelines-tutorial** project, paste the YAML into the textfield, and click on **Create**.
+Alternatively, in the OpenShift web console, you can click on **Add &#8594;
+Import YAML** at the top right of the screen while you are in the
+**pipelines-tutorial** project, paste the YAML into the textfield, and click on
+**Create**.
 
 ![OpenShift Console - Import Yaml](images/console-import-yaml-1.png)
 
@@ -214,7 +227,12 @@ petclinic-deploy-pipeline  25 seconds ago   ---        ---       ---        ---
 
 ## Trigger Pipeline
 
-Now that the pipeline is created, you can trigger it to execute the tasks specified in the pipeline. Triggering pipelines is an area that is under development and in the next release it will be possible to be done via the OpenShift web console and Tekton CLI. In this tutorial, you will trigger the pipeline through creating the Kubernetes objects (the hard way!) in order to learn the mechanics of triggering.
+Now that the pipeline is created, you can trigger it to execute the tasks
+specified in the pipeline. Triggering pipelines is an area that is under
+development and in the next release it will be possible to be done via the
+OpenShift web console and Tekton CLI. In this tutorial, you will trigger the
+pipeline through creating the Kubernetes objects (the hard way!) in order to
+learn the mechanics of triggering.
 
 First, you should create a number of `PipelineResource`s that contain the specifics of the Git repository and image registry to be used in the pipeline during execution. Expectedly, these are also reusable across multiple pipelines.
 
@@ -249,7 +267,7 @@ spec:
 Create the above pipeline resources via the OpenShift web console or by running the following:
 
 ```bash
-$ oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/master/resources/petclinic-resources.yaml
+$ oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/master/pipeline/02-resources.yaml
 ```
 
 You can see the list of resources created using the CLI:
