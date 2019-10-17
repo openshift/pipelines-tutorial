@@ -81,6 +81,7 @@ demo.setup() {
   info "ensure namespace $NAMESPACE exists"
   OC get ns "$NAMESPACE" 2>/dev/null  || {
     OC new-project $NAMESPACE
+    OC adm policy add-role-to-user edit -z pipeline # to be removed in 0.8
   }
 
   demo.get-tasks
