@@ -55,8 +55,9 @@ demo.validate() {
   return 0
 }
 
-declare -r TEKTON_CATALOG="https://raw.githubusercontent.com/tektoncd/catalog/master"
-declare -r OPENSHIFT_CATALOG="https://raw.githubusercontent.com/openshift/pipelines-catalog/master"
+declare -r CATALOG_VERSION="release-v0.7"
+declare -r TEKTON_CATALOG="https://raw.githubusercontent.com/openshift/tektoncd-catalog/$CATALOG_VERSION"
+declare -r OPENSHIFT_CATALOG="https://raw.githubusercontent.com/openshift/pipelines-catalog/$CATALOG_VERSION"
 declare -r TASKS_DIR=tmp/tasks
 
 declare -r OC_TASK="$TEKTON_CATALOG/openshift-client/openshift-client-task.yaml"
@@ -86,18 +87,16 @@ demo.setup() {
 
   info "Apply petclinic resources"
 
-  sed -e "s|pipelines-tutorial|$NAMESPACE|g" resources/petclinic.yaml |
-    OC apply -f -
+  sed -e "s|pipelines-tutorial|$NAMESPACE|g" petclinic/manifests.yaml | OC apply -f -
 
   info "Apply pipeline tasks"
   OC apply -f "$TASKS_DIR"
 
   info "Applying resources"
-  sed -e "s|pipelines-tutorial|$NAMESPACE|g" \
-    resources/petclinic-resources.yaml | OC apply -f -
+  sed -e "s|pipelines-tutorial|$NAMESPACE|g" pipeline/02-resources.yaml | OC apply -f -
 
   info "Applying pipeline"
-  OC apply -f resources/petclinic-deploy-pipeline.yaml
+  OC apply -f pipeline/01-build-deploy.yaml
 
   echo -e "\nPipeline"
   echo "==============="
@@ -105,7 +104,7 @@ demo.setup() {
 }
 
 demo.logs() {
-  TKN pipeline logs petclinic-deploy-pipeline -L -f
+  TKN pipeline logs petclinic-deploy-pipeline --last -f
 }
 
 demo.run() {
