@@ -29,4 +29,7 @@ spec:
       - build
     params:
     - name: ARGS
-      value: "rollout latest spring-petclinic"
+      value:
+        - rollout
+        - latest
+        - spring-petclinic
