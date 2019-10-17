@@ -55,8 +55,9 @@ demo.validate() {
   return 0
 }
 
-declare -r TEKTON_CATALOG="https://raw.githubusercontent.com/tektoncd/catalog/master"
-declare -r OPENSHIFT_CATALOG="https://raw.githubusercontent.com/openshift/pipelines-catalog/master"
+declare -r CATALOG_VERSION="release-v0.7"
+declare -r TEKTON_CATALOG="https://raw.githubusercontent.com/openshift/tektoncd-catalog/$CATALOG_VERSION"
+declare -r OPENSHIFT_CATALOG="https://raw.githubusercontent.com/openshift/pipelines-catalog/$CATALOG_VERSION"
 declare -r TASKS_DIR=tmp/tasks
 
 declare -r OC_TASK="$TEKTON_CATALOG/openshift-client/openshift-client-task.yaml"
