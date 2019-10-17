@@ -87,18 +87,16 @@ demo.setup() {
 
   info "Apply petclinic resources"
 
-  sed -e "s|pipelines-tutorial|$NAMESPACE|g" resources/petclinic.yaml |
-    OC apply -f -
+  sed -e "s|pipelines-tutorial|$NAMESPACE|g" petclinic/manifests.yaml | OC apply -f -
 
   info "Apply pipeline tasks"
   OC apply -f "$TASKS_DIR"
 
   info "Applying resources"
-  sed -e "s|pipelines-tutorial|$NAMESPACE|g" \
-    resources/petclinic-resources.yaml | OC apply -f -
+  sed -e "s|pipelines-tutorial|$NAMESPACE|g" pipeline/02-resources.yaml | OC apply -f -
 
   info "Applying pipeline"
-  OC apply -f resources/petclinic-deploy-pipeline.yaml
+  OC apply -f pipeline/01-build-deploy.yaml
 
   echo -e "\nPipeline"
   echo "==============="
@@ -106,7 +104,7 @@ demo.setup() {
 }
 
 demo.logs() {
-  TKN pipeline logs petclinic-deploy-pipeline -L -f
+  TKN pipeline logs petclinic-deploy-pipeline --last -f
 }
 
 demo.run() {
