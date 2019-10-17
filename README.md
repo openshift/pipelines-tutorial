@@ -119,8 +119,8 @@ Note that only the requirement for a git repository is declared on the task and 
 Install the `openshift-client` and `s2i-java` tasks from the catalog repository using `oc` or `kubectl`, which you will need for creating a pipeline in the next section:
 
 ```bash
-$ oc create -f https://raw.githubusercontent.com/tektoncd/catalog/master/openshift-client/openshift-client-task.yaml
-$ oc create -f https://raw.githubusercontent.com/openshift/pipelines-catalog/master/s2i-java-8/s2i-java-8-task.yaml
+$ oc create -f https://raw.githubusercontent.com/openshift/tektoncd-catalog/release-v0.5/openshift-client/openshift-client-task.yaml
+$ oc create -f https://raw.githubusercontent.com/openshift/pipelines-catalog/release-v0.5/s2i-java-8/s2i-java-8-task.yaml
 
 ```
 
