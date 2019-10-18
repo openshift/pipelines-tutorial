@@ -303,9 +303,8 @@ The `-r` flag specifies the `PipelineResource`s that should be provided to the p
 
 > **Note**: OpenShift Pipelines 0.7 does not automatically use the `pipeline` service account for running pipelineruns. This has been fixed in the next release, OpenShift Pipelines 0.8, but if you want to use the OpenShift Console developer perspective to start the pipeline with OpenShift Pipelines 0.7, run the following commands to elevate the permissions of the `default` service account, which is currently used by default for running pipelineruns that are started by the OpenShift Console:  
 >  ```
->  $ oc create serviceaccount pipeline
->  $ oc adm policy add-scc-to-user privileged -z pipeline
->  $ oc adm policy add-role-to-user edit -z pipeline
+>  $ oc adm policy add-scc-to-user privileged -z default
+>  $ oc adm policy add-role-to-user edit -z default
 >  ```
 
 As soon as you start the `petclinic-deploy-pipeline` pipeline, a pipelinerun will be instantiated and pods will be created to execute the tasks that are defined in the pipeline.
