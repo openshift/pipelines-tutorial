@@ -75,14 +75,6 @@ serviceaccount will be used later in the tutorial
 $ oc get serviceaccount   # should list pipeline
 ```
 
-Building container images using build tools such as S2I, Buildah, Kaniko, etc require access to the OpenShift internal registry in order to push images. Give the `pipeline` service account access to the internal registry:
-
-```
-$ oc adm policy add-role-to-user edit -z pipeline
-```
-
-> Note: that this step will be automated and performed by the OpenShift Pipelines Operator in the next release.
-
 You will use the [Spring PetClinic](https://github.com/spring-projects/spring-petclinic) sample application during this tutorial, which is a simple Spring Boot application.
 
 Create the Kubernetes objects for deploying the PetClinic app on OpenShift. The deployment will not complete since there are no container images built for the PetClinic application yet. That you will do in the following sections through a CI/CD pipeline:
