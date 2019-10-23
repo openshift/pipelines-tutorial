@@ -295,7 +295,6 @@ The `-r` flag specifies the `PipelineResource`s that should be provided to the p
 
 > **Note**: OpenShift Pipelines 0.7 does not automatically use the `pipeline` service account for running pipelineruns. This has been fixed in the next release, OpenShift Pipelines 0.8, but if you want to use the OpenShift Console developer perspective to start the pipeline with OpenShift Pipelines 0.7, run the following commands to elevate the permissions of the `default` service account, which is currently used by default for running pipelineruns that are started by the OpenShift Console:  
 >  ```
->  $ oc adm policy add-scc-to-user privileged -z default
 >  $ oc adm policy add-role-to-user edit -z default
 >  ```
 
