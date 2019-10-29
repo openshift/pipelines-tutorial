@@ -5,8 +5,6 @@ metadata:
 spec:
   pipelineRef:
     name: petclinic-deploy-pipeline
-  trigger:
-    type: manual
   serviceAccount: 'pipeline'
   resources:
   - name: app-git
