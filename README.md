@@ -80,7 +80,7 @@ You will use the [Spring PetClinic](https://github.com/spring-projects/spring-pe
 Create the Kubernetes objects for deploying the PetClinic app on OpenShift. The deployment will not complete since there are no container images built for the PetClinic application yet. That you will do in the following sections through a CI/CD pipeline:
 
 ```bash
-$ oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/master/petclinic/manifests.yaml
+$ oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/master/voting/manifests.yaml
 ```
 
 You should be able to see the deployment in the OpenShift Web Console.
@@ -121,7 +121,7 @@ Install the `openshift-client` and `s2i-java` tasks from the catalog repository 
 
 ```bash
 $ oc create -f https://raw.githubusercontent.com/openshift/tektoncd-catalog/release-v0.7/openshift-client/openshift-client-task.yaml
-$ oc create -f https://raw.githubusercontent.com/openshift/pipelines-catalog/release-v0.7/s2i-java-8/s2i-java-8-task.yaml
+$ oc create -f https://raw.githubusercontent.com/openshift/tektoncd-catalog/release-next/buildah/buildah.yaml
 
 ```
 
@@ -132,7 +132,7 @@ $ tkn task ls
 
 NAME               AGE
 openshift-client   58 seconds ago
-s2i-java-8         1 minute ago
+buildah            1 minute ago
 ```
 
 ## Create Pipeline
@@ -203,7 +203,7 @@ The execution order of `task`s is determined by dependencies that are defined be
 Create the pipeline by running the following:
 
 ```bash
-$ oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/master/pipeline/01-build-deploy.yaml
+$ oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/master/pipeline/pipeline.yaml
 ```
 
 Alternatively, in the OpenShift web console, you can click on **Add &#8594;
@@ -221,8 +221,8 @@ Check the list of pipelines you have created using the CLI:
 ```
 $ tkn pipeline ls
 
-NAME                       AGE              LAST RUN   STARTED   DURATION   STATUS
-petclinic-deploy-pipeline  25 seconds ago   ---        ---       ---        ---
+NAME     AGE              LAST RUN   STARTED   DURATION   STATUS
+voting   25 seconds ago   ---        ---       ---        ---
 ```
 
 ## Trigger Pipeline
@@ -267,7 +267,7 @@ spec:
 Create the above pipeline resources via the OpenShift web console or by running the following:
 
 ```bash
-$ oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/master/pipeline/02-resources.yaml
+$ oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/master/pipeline/resources.yaml
 ```
 
 You can see the list of resources created using the CLI:
@@ -275,20 +275,24 @@ You can see the list of resources created using the CLI:
 ```bash
 $ tkn resource ls
 
-NAME              TYPE    DETAILS
-petclinic-git     git     url: https://github.com/spring-projects/spring-petclinic
-petclinic-image   image   url: image-registry.openshift-image-registry.svc:5000/pipelines-tutorial/spring-petclinic
+NAME               TYPE    DETAILS
+voting-api-repo    git     url: http://github.com/sthaha/vote-api.git
+voting-ui-repo     git     url: http://github.com/sthaha/vote-ui.git
+voting-api-image   image   url: image-registry.openshift-image-registry.svc:5000/pipelines-tutorial/voting-api
+voting-ui-image    image   url: image-registry.openshift-image-registry.svc:5000/pipelines-tutorial/voting-ui
 ```
 
 A `PipelineRun` is how you can start a pipeline and tie it to the Git and image resources that should be used for this specific invocation. You can start the pipeline using the CLI:
 
 ```bash
-$ tkn pipeline start petclinic-deploy-pipeline \
-        -r app-git=petclinic-git \
-        -r app-image=petclinic-image \
+$ tkn pipeline start voting \
+        -r api-repo=voting-api-repo \
+        -r api-image=voting-api-image \
+        -r ui-repo=voting-ui-repo \
+        -r ui-image=voting-ui-image \
         -s pipeline
 
-Pipelinerun started: petclinic-deploy-pipeline-run-q62p8
+Pipelinerun started: voting-run-tsv92
 ```
 
 The `-r` flag specifies the `PipelineResource`s that should be provided to the pipeline and the `-s` flag specifies the service account to be used for running the pipeline.
@@ -310,13 +314,14 @@ Check out the logs of the pipelinerun as it runs using the `tkn pipeline logs` c
 
 ```
 $ tkn pipeline logs -f
-? Select pipeline : petclinic-deploy-pipeline
-? Select pipelinerun : petclinic-deploy-pipeline-run-tsv92 started 39 seconds ago
+? Select pipeline : voting
+? Select pipelinerun : voting-run-tsv92 started 39 seconds ago
 
 ...
-[build : nop] Build successful
-[deploy : build-step-oc] deploymentconfig.apps.openshift.io/spring-petclinic rolled out
-[deploy : nop] Build successful
+[build-ui : image-digest-exporter-bqprt] 2019/11/20 05:15:46 ImageResource ui-image doesn't have an index.json file: stat /builder/home/image-outputs/image/index.json: no such file or directory
+[build-ui : image-digest-exporter-bqprt] 2019/11/20 05:15:46 Image digest exporter output: [] 
+
+[deploy-ui : oc] deploymentconfig.apps.openshift.io/voting-ui rolled out
 ```
 
 After a few minutes, the pipeline would finish successfully.
@@ -324,8 +329,8 @@ After a few minutes, the pipeline would finish successfully.
 ```bash
 $ tkn pipeline list
 
-NAME                        AGE             LAST RUN                              STARTED         DURATION    STATUS
-petclinic-deploy-pipeline   7 minutes ago   petclinic-deploy-pipeline-run-tsv92   5 minutes ago   4 minutes   Succeeded
+NAME     AGE             LAST RUN           STARTED         DURATION    STATUS
+voting   7 minutes ago   voting-run-tsv92   5 minutes ago   4 minutes   Succeeded
 ```
 
 Looking back at the project, you should see that the PetClinic image is successfully built and deployed.
@@ -333,9 +338,11 @@ Looking back at the project, you should see that the PetClinic image is successf
 ![PetClinic Deployed](images/petclinic-deployed-2.png)
 
 
+Access the application at url created like http://voting-ui-pipelines-tutorial.apps-crc.testing/
+
 If you want to re-run the pipeline again, you can use the following short-hand command to rerun the last pipelinerun again, using
 the same pipeline resources and service account used in the previous pipeline:
 
 ```
-tkn pipeline start petclinic-deploy-pipeline --last
+tkn pipeline start voting --last
 ```

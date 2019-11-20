@@ -1,0 +1,70 @@
+---
+apiVersion: tekton.dev/v1alpha1
+kind: Pipeline
+metadata:
+  name: voting
+  namespace: pipelines-tutorial
+spec:
+  resources:
+    - name: api-repo
+      type: git
+    - name: api-image
+      type: image
+    - name: ui-repo
+      type: git
+    - name: ui-image
+      type: image
+
+  tasks:
+    - name: build-api
+      taskRef:
+        name: buildah
+      resources:
+        inputs:
+          - name: source
+            resource: api-repo
+        outputs:
+          - name: image
+            resource: api-image
+      params:
+        - name: TLSVERIFY
+          value: "false"
+
+    - name: deploy-api
+      taskRef:
+        name: openshift-client
+      params:
+        - name: ARGS
+          value:
+            - "rollout"
+            - "latest"
+            - "voting-api"
+      runAfter:
+        - build-api
+
+    - name: build-ui
+      taskRef:
+        name: buildah
+      resources:
+        inputs:
+          - name: source
+            resource: ui-repo
+        outputs:
+          - name: image
+            resource: ui-image
+      params:
+        - name: TLSVERIFY
+          value: "false"
+
+    - name: deploy-ui
+      taskRef:
+        name: openshift-client
+      params:
+        - name: ARGS
+          value:
+            - "rollout"
+            - "latest"
+            - "voting-ui"
+      runAfter:
+        - deploy-api
+        - build-ui

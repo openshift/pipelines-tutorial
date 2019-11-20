@@ -1,0 +1,147 @@
+---
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  labels:
+    app: voting-ui
+  name: voting-ui
+  namespace: pipelines-tutorial
+---
+apiVersion: apps.openshift.io/v1
+kind: DeploymentConfig
+metadata:
+  labels:
+    app: voting-ui
+  name: voting-ui
+  namespace: pipelines-tutorial
+spec:
+  replicas: 1
+  selector:
+    app: voting-ui
+    deploymentconfig: voting-ui
+  strategy:
+    type: Rolling
+  template:
+    metadata:
+      labels:
+        app: voting-ui
+        deploymentconfig: voting-ui
+    spec:
+      containers:
+        - image: voting-ui:latest
+          imagePullPolicy: Always
+          name: voting-ui
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+            - containerPort: 9000
+              protocol: TCP
+          env:
+            - name: VOTING_API_SERVICE_HOST
+              value: "voting-api"
+            - name: VOTING_API_SERVICE_PORT
+              value: "9000"
+  triggers:
+    - imageChangeParams:
+        containerNames:
+          - voting-ui
+        from:
+          kind: ImageStreamTag
+          name: voting-ui:latest
+          namespace: pipelines-tutorial
+      type: ImageChange
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: voting-ui
+  name: voting-ui
+  namespace: pipelines-tutorial
+spec:
+  ports:
+    - name: 8080-tcp
+      port: 8080
+      protocol: TCP
+      targetPort: 8080
+  selector:
+    app: voting-ui
+    deploymentconfig: voting-ui
+  type: ClusterIP
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  labels:
+    app: voting-ui
+  name: voting-ui
+  namespace: pipelines-tutorial
+spec:
+  port:
+    targetPort: 8080-tcp
+  to:
+    kind: Service
+    name: voting-ui
+    weight: 100
+---
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  labels:
+    app: voting-api
+  name: voting-api
+  namespace: pipelines-tutorial
+---
+apiVersion: apps.openshift.io/v1
+kind: DeploymentConfig
+metadata:
+  labels:
+    app: voting-api
+  name: voting-api
+  namespace: pipelines-tutorial
+spec:
+  replicas: 1
+  selector:
+    app: voting-api
+    deploymentconfig: voting-api
+  strategy:
+    type: Rolling
+  template:
+    metadata:
+      labels:
+        app: voting-api
+        deploymentconfig: voting-api
+    spec:
+      containers:
+        - image: voting-api:latest
+          imagePullPolicy: Always
+          name: voting-api
+          ports:
+            - containerPort: 9000
+              protocol: TCP
+  triggers:
+    - imageChangeParams:
+        containerNames:
+          - voting-api
+        from:
+          kind: ImageStreamTag
+          name: voting-api:latest
+          namespace: pipelines-tutorial
+      type: ImageChange
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: voting-api
+  name: voting-api
+  namespace: pipelines-tutorial
+spec:
+  ports:
+    - port: 9000
+      protocol: TCP
+      targetPort: 9000
+  selector:
+    app: voting-api
+    deploymentconfig: voting-api
+  type: ClusterIP

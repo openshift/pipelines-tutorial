@@ -1,0 +1,22 @@
+apiVersion: tekton.dev/v1alpha1
+kind: PipelineRun
+metadata:
+  generateName: voting-pipelinerun-
+  namespace: pipelines-tutorial
+spec:
+  pipelineRef:
+    name: voting
+  serviceAccount: 'pipeline'
+  resources:
+  - name: api-repo
+    resourceRef:
+      name: voting-api-repo
+  - name: api-image
+    resourceRef:
+      name: voting-api-image
+  - name: ui-repo
+    resourceRef:
+      name: voting-ui-repo
+  - name: ui-image
+    resourceRef:
+      name: voting-ui-image

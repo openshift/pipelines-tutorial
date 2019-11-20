@@ -1,0 +1,44 @@
+---
+apiVersion: tekton.dev/v1alpha1
+kind: PipelineResource
+metadata:
+  name: voting-api-repo
+  namespace: pipelines-tutorial
+spec:
+  type: git
+  params:
+    - name: url
+      value: http://github.com/sthaha/vote-api.git
+---
+apiVersion: tekton.dev/v1alpha1
+kind: PipelineResource
+metadata:
+  name: voting-api-image
+  namespace: pipelines-tutorial
+spec:
+  type: image
+  params:
+    - name: url
+      value: image-registry.openshift-image-registry.svc:5000/pipelines-tutorial/voting-api
+---
+apiVersion: tekton.dev/v1alpha1
+kind: PipelineResource
+metadata:
+  name: voting-ui-repo
+  namespace: pipelines-tutorial
+spec:
+  type: git
+  params:
+    - name: url
+      value: http://github.com/sthaha/vote-ui.git
+---
+apiVersion: tekton.dev/v1alpha1
+kind: PipelineResource
+metadata:
+  name: voting-ui-image
+  namespace: pipelines-tutorial
+spec:
+  type: image
+  params:
+    - name: url
+      value: image-registry.openshift-image-registry.svc:5000/pipelines-tutorial/voting-ui
