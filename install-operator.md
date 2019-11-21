@@ -2,24 +2,34 @@
 
 OpenShift Pipelines is provided as an add-on on top of OpenShift that can be installed via an operator that is available in the OpenShift OperatorHub.
 
-Go to **Catalog > OperatorHub** in the Web Console. You can see the list of available operators for OpenShift, provided by Red Hat as well as a community of partners and open-source projects. 
+To start, make sure you are on the **Administrator** perspective as shown below:
 
-Click on **Integration & Delivery** category to find **OpenShift Pipeline Operator**.
+![Administrator Perspective](images/administrator.png)
+
+Go to **Operators > OperatorHub** in the Web Console. You can see the list of available operators for OpenShift provided by Red Hat as well as a community of partners and open-source projects.
 
 ![OpenShift OperatorHub](images/operatorhub.png)
 
-Click on **OpenShift Pipelines Operator**, **Continue**, and then **Install**
+In the search bar where it says `Filter by keyword...`, type OpenShift Pipelines to find the **OpenShift Pipelines Operator**:
 
-![OpenShift Pipelines Operator](images/operator-install-1.png)
+![OpenShift OperatorHub](images/pipelines-operator.png)
 
-Click on **Subscribe** in order to subscribe to the installation and update channels.
+Click on **OpenShift Pipelines Operator**, **Continue**, and then **Install**:
 
-![OpenShift Pipelines Operator](images/operator-install-2.png)
+![OpenShift Pipelines Operator 1](images/operator-install-1.png)
 
-The operator is installed when you see the status updated from `1 installing` to `1 installed`. This operator automates installation and updates of OpenShift Pipelines on the cluster and applies all configurations needed.
+Leave the default settings and click on **Subscribe** in order to subscribe to the installation and update channels:
 
-Click on `1 installed` to go to the installed operator in order to install OpenShift Pipelines.
+![OpenShift Pipelines Operator 2](images/operator-install-2.png)
 
-![OpenShift Pipelines Operator](images/operator-install-3.png)
+After clicking **Subscribe**, you will be taken to the **Installed Operators** page. If you do not see the **OpenShift Pipelines Operator** as shown below, simply wait a moment while the **OpenShift Pipelines Operator** finishes installation:
+
+![OpenShift Pipelines Operator 3](images/operator-install-3.png)
+
+Click on **OpenShift Pipelines Operator** under the `Name` column and then click on **Create Instance**:
+
+![OpenShift Pipelines Operator 4](images/operator-install-4.png)
+
+Leave the default values in the **Create Config** editor and click **Create**.
 
 That's all. The operator now installs OpenShift Pipelines on the cluster.
