@@ -80,7 +80,7 @@ You will use the [Spring PetClinic](https://github.com/spring-projects/spring-pe
 Create the Kubernetes objects for deploying the PetClinic app on OpenShift. The deployment will not complete since there are no container images built for the PetClinic application yet. That you will do in the following sections through a CI/CD pipeline:
 
 ```bash
-$ oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/master/petclinic/manifests.yaml
+$ oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/release-v0.7/petclinic/manifests.yaml
 ```
 
 You should be able to see the deployment in the OpenShift Web Console by switching over to the **Developer** perspective of the OpenShift web console. Change from **Administrator** to **Developer** from the drop down as shown below:
@@ -214,7 +214,7 @@ The execution order of task is determined by dependencies that are defined betwe
 Create the pipeline by running the following:
 
 ```bash
-$ oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/master/pipeline/01-build-deploy.yaml
+$ oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/release-v0.7/pipeline/01-build-deploy.yaml
 ```
 
 Alternatively, in the OpenShift web console, you can click on the **+** at the top right of the screen while you are in the **pipelines-tutorial** project:
@@ -276,7 +276,7 @@ spec:
 Create the above pipeline resources via the OpenShift web console or by running the following:
 
 ```bash
-$ oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/master/pipeline/02-resources.yaml
+$ oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/release-v0.7/pipeline/02-resources.yaml
 ```
 
 You can see the list of resources created using `tkn`:
