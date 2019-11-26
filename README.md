@@ -75,15 +75,11 @@ Run the following command to see the `pipeline` service account:
 $ oc get serviceaccount pipeline
 ```
 
-You will use the [Spring PetClinic](https://github.com/spring-projects/spring-petclinic) sample application during this tutorial, which is a simple Spring Boot application.
+You will use the simple application during this tutorial, which has a [frontend](https://github.com/openshift-pipelines/vote-ui) and [backend](https://github.com/openshift-pipelines/vote-api)
 
-Create the Kubernetes objects for deploying the PetClinic app on OpenShift. The deployment will not complete since there are no container images built for the PetClinic application yet. That you will do in the following sections through a CI/CD pipeline:
+You can also deploy the same applications by applying the artifacts available in k8s directory of the respective repo
 
-```bash
-$ oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/master/petclinic/manifests.yaml
-```
-
-You should be able to see the deployment in the OpenShift Web Console by switching over to the **Developer** perspective of the OpenShift web console. Change from **Administrator** to **Developer** from the drop down as shown below:
+If you deploy the application directly, you should be able to see the deployment in the OpenShift Web Console by switching over to the **Developer** perspective of the OpenShift web console. Change from **Administrator** to **Developer** from the drop down as shown below:
 
 ![Developer Perspective](images/developer.png)
 
@@ -93,7 +89,7 @@ Make sure you are on the `pipelines-tutorial` project by selecting it from the *
 
 On the **Topology** view of the **Developer** perspective, you will be able to see the resources you just created.
 
-![Projects](images/petclinic-deployed-1.png)
+![Projects](images/application-deployed.png)
 
 ## Install Tasks
 
@@ -125,11 +121,11 @@ When a task starts running, it starts a pod and runs each step sequentially in a
 
 Note that only the requirement for a git repository is declared on the task and not a specific git repository to be used. That allows tasks to be reusable for multiple pipelines and purposes. You can find more examples of reusable tasks in the [Tekton Catalog](https://github.com/tektoncd/catalog) and [OpenShift Catalog](https://github.com/openshift/pipelines-catalog) repositories.
 
-Install the `openshift-client` and `s2i-java` tasks from the catalog repository using `oc` or `kubectl`, which you will need for creating a pipeline in the next section:
+Install the `apply-manifests` and `update-deployment` tasks from the repository using `oc` or `kubectl`, which you will need for creating a pipeline in the next section:
 
 ```bash
-$ oc create -f https://raw.githubusercontent.com/openshift/tektoncd-catalog/release-v0.7/openshift-client/openshift-client-task.yaml
-$ oc create -f https://raw.githubusercontent.com/openshift/pipelines-catalog/release-v0.7/s2i-java-8/s2i-java-8-task.yaml
+$ oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/master/pipeline/update_deployment_task.yaml
+$ oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/master/pipeline/apply_manifest_task.yaml
 
 ```
 
@@ -138,18 +134,41 @@ You can take a look at the tasks you created using the [Tekton CLI](https://gith
 ```
 $ tkn task ls
 
-NAME               AGE
-openshift-client   58 seconds ago
-s2i-java-8         1 minute ago
+NAME                AGE
+apply-manifests     10 seconds ago
+update-deployment   4 seconds ago
+```
+
+We will be using `buildah` and`s2i-python-3` tasks also which gets installed along with Operator. Operator installs few ClusterTask which you can see.
+
+```
+$ tkn clustertask ls
+NAME                      AGE
+buildah                   9 hours ago
+buildah-v0-8-0            9 hours ago
+openshift-client          9 hours ago
+openshift-client-v0-8-0   9 hours ago
+s2i                       9 hours ago
+s2i-go                    9 hours ago
+s2i-go-v0-8-0             9 hours ago
+s2i-java-11               9 hours ago
+s2i-java-11-v0-8-0        9 hours ago
+s2i-java-8                9 hours ago
+s2i-java-8-v0-8-0         9 hours ago
+s2i-nodejs                9 hours ago
+s2i-nodejs-v0-8-0         9 hours ago
+s2i-python-3              9 hours ago
+s2i-python-3-v0-8-0       9 hours ago
+s2i-v0-8-0                9 hours ago
 ```
 
 ## Create Pipeline
 
 A pipeline defines a number of tasks that should be executed and how they interact with each other via their inputs and outputs.
 
-In this tutorial, you will create a pipeline that takes the source code of the PetClinic application from GitHub and then builds and deploys it on OpenShift using [Source-to-Image (S2I)](https://docs.openshift.com/container-platform/4.1/builds/understanding-image-builds.html#build-strategy-s2i_understanding-image-builds).
+In this tutorial, you will create a pipeline that takes the source code of the application from GitHub and then builds and deploys it on OpenShift.
 
-<p align="center"><img src="images/pipeline-diagram.svg" width="700" alt="Pipeline Diagram" /></div>
+![Pipeline Diagram](images/pipeline-diagram.png)
 
 Here is the YAML file that represents the above pipeline:
 
@@ -157,50 +176,109 @@ Here is the YAML file that represents the above pipeline:
 apiVersion: tekton.dev/v1alpha1
 kind: Pipeline
 metadata:
-  name: petclinic-deploy-pipeline
+  name: build-and-deploy
 spec:
   resources:
-  - name: app-git
-    type: git
-  - name: app-image
-    type: image
+    - name: api-repo
+      type: git
+    - name: api-image
+      type: image
+    - name: ui-repo
+      type: git
+    - name: ui-image
+      type: image
+
   tasks:
-  - name: build
-    taskRef:
-      name: s2i-java-8
-    params:
-      - name: TLSVERIFY
-        value: "false"
-    resources:
-      inputs:
-      - name: source
-        resource: app-git
-      outputs:
-      - name: image
-        resource: app-image
-  - name: deploy
-    taskRef:
-      name: openshift-client
-    runAfter:
-      - build
-    params:
-    - name: ARGS
-      value:
-        - rollout
-        - latest
-        - spring-petclinic
+    - name: build-api
+      taskRef:
+        name: buildah
+        kind: ClusterTask
+      resources:
+        inputs:
+          - name: source
+            resource: api-repo
+        outputs:
+          - name: image
+            resource: api-image
+      params:
+        - name: TLSVERIFY
+          value: "false"
+
+    - name: apply-api-manifests
+      taskRef:
+        name: apply-manifests
+      resources:
+        inputs:
+          - name: source
+            resource: api-repo
+      runAfter:
+        - build-api
+
+    - name: update-api-image
+      taskRef:
+        name: update-deployment
+      resources:
+        inputs:
+          - name: image
+            resource: api-image
+      params:
+        - name: deployment
+          value: "api"
+      runAfter:
+        - apply-api-manifests
+
+    - name: build-ui
+      taskRef:
+        name: s2i-python-3
+        kind: ClusterTask
+      resources:
+        inputs:
+          - name: source
+            resource: ui-repo
+        outputs:
+          - name: image
+            resource: ui-image
+      params:
+        - name: TLSVERIFY
+          value: "false"
+
+    - name: apply-ui-manifests
+      taskRef:
+        name: apply-manifests
+      resources:
+        inputs:
+          - name: source
+            resource: ui-repo
+      runAfter:
+        - build-ui
+        - update-api-image
+
+    - name: update-ui-image
+      taskRef:
+        name: update-deployment
+      resources:
+        inputs:
+          - name: image
+            resource: ui-image
+      params:
+        - name: deployment
+          value: "ui"
+      runAfter:
+        - apply-ui-manifests
 ```
 
 This pipeline performs the following:
-1. Clones the source code of the application from a git repository (`app-git`
-   resource)
-2. Builds the container image using the `s2i-java-8` task that generates a
-   Dockerfile for the application and uses [Buildah](https://buildah.io/) to
-   build the image
-3. The application image is pushed to an image registry (`app-image` resource)
-4. The new application image is deployed on OpenShift using the `openshift-cli`
+1. Clones the source code of the frontend application from a git repository (`api-repo`
+   resource) and the backend application from a git repository (`ui-repo`resource)
+2. Builds the container image of frontend using the `s2i-python-3` task that generates a
+   Dockerfile for the application using [Source-to-Image (S2I)](https://docs.openshift.com/container-platform/4.1/builds/understanding-image-builds.html#build-strategy-s2i_understanding-image-builds).
+   and uses [Buildah](https://buildah.io/) to build the image
+3. Builds the container image of backend using the `buildah` task 
+   that uses [Buildah](https://buildah.io/) to build the image
+4. The application image is pushed to an image registry (`api-image` and `ui-image` resource)
+5. The new application image is deployed on OpenShift using the `apply-manifests` and `update-deployment` tasks.
 
-You might have noticed that there are no references to the PetClinic git
+You might have noticed that there are no references to the git
 repository or the image registry it will be pushed to. That's because pipeline in Tekton
 are designed to be generic and re-usable across environments and stages through
 the application's lifecycle. Pipelines abstract away the specifics of the git
@@ -214,7 +292,7 @@ The execution order of task is determined by dependencies that are defined betwe
 Create the pipeline by running the following:
 
 ```bash
-$ oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/master/pipeline/01-build-deploy.yaml
+$ oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/master/pipeline/pipeline.yaml
 ```
 
 Alternatively, in the OpenShift web console, you can click on the **+** at the top right of the screen while you are in the **pipelines-tutorial** project:
@@ -234,8 +312,8 @@ Check the list of pipelines you have created using the CLI:
 ```
 $ tkn pipeline ls
 
-NAME                       AGE              LAST RUN   STARTED   DURATION   STATUS
-petclinic-deploy-pipeline  25 seconds ago   ---        ---       ---        ---
+NAME               AGE            LAST RUN   STARTED   DURATION   STATUS
+build-and-deploy   1 minute ago   ---        ---       ---        ---
 ```
 
 ## Trigger Pipeline
@@ -245,38 +323,66 @@ specified in the pipeline.
 
 First, you should create a number of `PipelineResources` that contain the specifics of the git repository and image registry to be used in the pipeline during execution. Expectedly, these are also reusable across multiple pipelines.
 
-The following `PipelineResource` defines the git repository for the PetClinic application:
+The following `PipelineResource` defines the git repository for the frontend application:
 
 ```yaml
 apiVersion: tekton.dev/v1alpha1
 kind: PipelineResource
 metadata:
-  name: petclinic-git
+  name: ui-repo
 spec:
   type: git
   params:
-  - name: url
-    value: https://github.com/spring-projects/spring-petclinic
+    - name: url
+      value: http://github.com/openshift-pipelines/vote-ui.git
 ```
 
-And the following defines the OpenShift internal image registry for the PetClinic image to be pushed to:
+And the following defines the OpenShift internal image registry for the frontend image to be pushed to:
 
 ```yaml
 apiVersion: tekton.dev/v1alpha1
 kind: PipelineResource
 metadata:
-  name: petclinic-image
+  name: ui-image
 spec:
   type: image
   params:
-  - name: url
-    value: image-registry.openshift-image-registry.svc:5000/pipelines-tutorial/spring-petclinic
+    - name: url
+      value: image-registry.openshift-image-registry.svc:5000/pipelines-tutorial/ui:latest
+```
+
+And the following `PipelineResource` defines the git repository for the backend application:
+
+```yaml
+apiVersion: tekton.dev/v1alpha1
+kind: PipelineResource
+metadata:
+  name: api-repo
+spec:
+  type: git
+  params:
+    - name: url
+      value: http://github.com/openshift-pipelines/vote-api.git
+```
+
+And the following defines the OpenShift internal image registry for the backend image to be pushed to:
+
+```yaml
+apiVersion: tekton.dev/v1alpha1
+kind: PipelineResource
+metadata:
+  name: api-image
+spec:
+  type: image
+  params:
+    - name: url
+      value: image-registry.openshift-image-registry.svc:5000/pipelines-tutorial/api:latest
 ```
 
 Create the above pipeline resources via the OpenShift web console or by running the following:
 
 ```bash
-$ oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/master/pipeline/02-resources.yaml
+$ oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/master/pipeline/resources.yaml
 ```
 
 You can see the list of resources created using `tkn`:
@@ -284,41 +390,42 @@ You can see the list of resources created using `tkn`:
 ```bash
 $ tkn resource ls
 
-NAME              TYPE    DETAILS
-petclinic-git     git     url: https://github.com/spring-projects/spring-petclinic
-petclinic-image   image   url: image-registry.openshift-image-registry.svc:5000/pipelines-tutorial/spring-petclinic
+NAME        TYPE    DETAILS
+api-repo    git     url: http://github.com/openshift-pipelines/vote-api.git
+ui-repo     git     url: http://github.com/openshift-pipelines/vote-ui.git
+api-image   image   url: image-registry.openshift-image-registry.svc:5000/pipelines-tutorial/api:latest
+ui-image    image   url: image-registry.openshift-image-registry.svc:5000/pipelines-tutorial/ui:latest
 ```
 
 A `PipelineRun` is how you can start a pipeline and tie it to the git and image resources that should be used for this specific invocation. You can start the pipeline using `tkn`:
 
 ```bash
-$ tkn pipeline start petclinic-deploy-pipeline \
-        -r app-git=petclinic-git \
-        -r app-image=petclinic-image \
-        -s pipeline
+$ tkn pipeline start build-and-deploy
+? Choose the git resource to use for api-repo: api-repo (http://github.com/openshift-pipelines/vote-api.git)
+? Choose the image resource to use for api-image: api-image (image-registry.openshift-image-registry.svc:5000/pipelines-tutorial/api:latest)
+? Choose the git resource to use for ui-repo: ui-repo (http://github.com/openshift-pipelines/vote-ui.git)
+? Choose the image resource to use for ui-image: ui-image (image-registry.openshift-image-registry.svc:5000/pipelines-tutorial/ui:latest)
+Pipelinerun started: build-and-deploy-run-z2rz8
+Showing logs...
+
 ```
 
-The `-r` flag specifies the pipeline resources that should be provided to the pipeline, and the `-s` flag specifies the service account to be used for running the pipeline.
+And it will start streaming the logs of the pipeline we just trigered.
 
-> **Note**: OpenShift Pipelines 0.7 does not automatically use the `pipeline` service account for running pipelineruns. This has been fixed in the next release (OpenShift Pipelines 0.8), but if you want to use the OpenShift web console developer perspective to start the pipeline with OpenShift Pipelines 0.7, run the following commands to elevate the permissions of the `default` service account, which is currently used by default for running pipelineruns that are started by the OpenShift Console:  
->  ```
->  $ oc adm policy add-role-to-user edit -z default
->  ```
-
-As soon as you start the `petclinic-deploy-pipeline` pipeline, a pipelinerun will be instantiated and pods will be created to execute the tasks that are defined in the pipeline.
+As soon as you start the `build-and-deploy` pipeline, a pipelinerun will be instantiated and pods will be created to execute the tasks that are defined in the pipeline.
 
 ```bash
 $ tkn pipeline list
-NAME                        AGE             LAST RUN                              STARTED         DURATION   STATUS
-petclinic-deploy-pipeline   23 seconds ago   petclinic-deploy-pipeline-run-tsv92  23 seconds ago   ---        Running
+NAME               AGE             LAST RUN                     STARTED          DURATION   STATUS
+build-and-deploy   6 minutes ago   build-and-deploy-run-z2rz8   36 seconds ago   ---        Running
+
 ```
 
 Check out the logs of the pipelinerun as it runs using the `tkn pipeline logs` command which interactively allows you to pick the pipelinerun of your interest and inspect the logs:
 
 ```
 $ tkn pipeline logs -f
-? Select pipeline : petclinic-deploy-pipeline
-? Select pipelinerun : petclinic-deploy-pipeline-run-tsv92 started 39 seconds ago
+? Select pipeline : build-and-deploy
 ```
 
 After a few minutes, the pipeline should finish successfully.
@@ -326,17 +433,23 @@ After a few minutes, the pipeline should finish successfully.
 ```bash
 $ tkn pipeline list
 
-NAME                        AGE             LAST RUN                              STARTED         DURATION    STATUS
-petclinic-deploy-pipeline   7 minutes ago   petclinic-deploy-pipeline-run-tsv92   7 minutes ago   7 minutes   Succeeded
+NAME               AGE              LAST RUN                     STARTED         DURATION    STATUS
+build-and-deploy   11 minutes ago   build-and-deploy-run-z2rz8   5 minutes ago   5 minutes   Succeeded
 ```
 
-Looking back at the project, you should see that the PetClinic image is successfully built and deployed.
+Looking back at the project, you should see that the images are successfully built and deployed.
 
-![PetClinic Deployed](images/petclinic-deployed-2.png)
+![Application Deployed](images/application-deployed.png)
+
+You can get the route of the application by executing the following command and access the application
+
+```bash
+HOST=$(eval 'oc get route ui --template={{.spec.host}}') && echo http://$HOST
+```
 
 
 If you want to re-run the pipeline again, you can use the following short-hand command to rerun the last pipelinerun again that uses the same pipeline resources and service account used in the previous pipeline run:
 
 ```
-tkn pipeline start petclinic-deploy-pipeline --last
+tkn pipeline start build-and-deploy --last
 ```

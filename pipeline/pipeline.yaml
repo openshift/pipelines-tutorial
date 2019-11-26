@@ -1,0 +1,92 @@
+apiVersion: tekton.dev/v1alpha1
+kind: Pipeline
+metadata:
+  name: build-and-deploy
+spec:
+  resources:
+    - name: api-repo
+      type: git
+    - name: api-image
+      type: image
+    - name: ui-repo
+      type: git
+    - name: ui-image
+      type: image
+
+  tasks:
+    - name: build-api
+      taskRef:
+        name: buildah
+        kind: ClusterTask
+      resources:
+        inputs:
+          - name: source
+            resource: api-repo
+        outputs:
+          - name: image
+            resource: api-image
+      params:
+        - name: TLSVERIFY
+          value: "false"
+
+    - name: apply-api-manifests
+      taskRef:
+        name: apply-manifests
+      resources:
+        inputs:
+          - name: source
+            resource: api-repo
+      runAfter:
+        - build-api
+
+    - name: update-api-image
+      taskRef:
+        name: update-deployment
+      resources:
+        inputs:
+          - name: image
+            resource: api-image
+      params:
+        - name: deployment
+          value: "api"
+      runAfter:
+        - apply-api-manifests
+
+    - name: build-ui
+      taskRef:
+        name: s2i-python-3
+        kind: ClusterTask
+      resources:
+        inputs:
+          - name: source
+            resource: ui-repo
+        outputs:
+          - name: image
+            resource: ui-image
+      params:
+        - name: TLSVERIFY
+          value: "false"
+
+    - name: apply-ui-manifests
+      taskRef:
+        name: apply-manifests
+      resources:
+        inputs:
+          - name: source
+            resource: ui-repo
+      runAfter:
+        - build-ui
+        - update-api-image
+
+    - name: update-ui-image
+      taskRef:
+        name: update-deployment
+      resources:
+        inputs:
+          - name: image
+            resource: ui-image
+      params:
+        - name: deployment
+          value: "ui"
+      runAfter:
+        - apply-ui-manifests
