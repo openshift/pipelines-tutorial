@@ -55,24 +55,7 @@ demo.validate() {
   return 0
 }
 
-declare -r CATALOG_VERSION="release-v0.7"
-declare -r TEKTON_CATALOG="https://raw.githubusercontent.com/openshift/tektoncd-catalog/$CATALOG_VERSION"
-declare -r OPENSHIFT_CATALOG="https://raw.githubusercontent.com/openshift/pipelines-catalog/$CATALOG_VERSION"
 declare -r TASKS_DIR=tmp/tasks
-
-declare -r OC_TASK="$TEKTON_CATALOG/openshift-client/openshift-client-task.yaml"
-declare -r LOCAL_OC_TASK="$TASKS_DIR/oc.task.yaml"
-
-declare -r S2I_JAVA8_TASK="$OPENSHIFT_CATALOG/s2i-java-8/s2i-java-8-task.yaml"
-declare -r LOCAL_S2I_JAVA8_TASK="$TASKS_DIR/s2i-java8.task.yaml"
-
-demo.get-tasks() {
-  info "Downloading tasks from catalog to $TASKS_DIR directory"
-  mkdir -p "$TASKS_DIR"
-  curl -sLf  "$S2I_JAVA8_TASK" -o "$LOCAL_S2I_JAVA8_TASK"
-  curl -sLf  "$OC_TASK" -o "$LOCAL_OC_TASK"
-}
-
 
 demo.setup() {
   demo.validate
@@ -83,38 +66,38 @@ demo.setup() {
     OC new-project $NAMESPACE
   }
 
-  demo.get-tasks
-
-  info "Apply petclinic resources"
-
-  sed -e "s|pipelines-tutorial|$NAMESPACE|g" petclinic/manifests.yaml | OC apply -f -
-
   info "Apply pipeline tasks"
-  OC apply -f "$TASKS_DIR"
+  OC apply -f pipeline/apply_manifest_task.yaml
+  OC apply -f pipeline/update_deployment_task.yaml
 
   info "Applying resources"
-  sed -e "s|pipelines-tutorial|$NAMESPACE|g" pipeline/02-resources.yaml | OC apply -f -
+  sed -e "s|pipelines-tutorial|$NAMESPACE|g" pipeline/resources.yaml | OC apply -f -
 
   info "Applying pipeline"
-  OC apply -f pipeline/01-build-deploy.yaml
+  OC apply -f pipeline/pipeline.yaml
 
   echo -e "\nPipeline"
   echo "==============="
-  TKN p desc petclinic-deploy-pipeline
+  TKN p desc build-and-deploy
 }
 
 demo.logs() {
-  TKN pipeline logs petclinic-deploy-pipeline --last -f
+  TKN pipeline logs build-and-deploy --last -f
 }
 
 demo.run() {
-  TKN pipeline start petclinic-deploy-pipeline \
-    -r app-git=petclinic-git \
-    -r app-image=petclinic-image \
-    -s pipeline
+  TKN pipeline start build-and-deploy \
+    -r api-repo=api-repo \
+    -r api-image=api-image \
+    -r ui-repo=ui-repo \
+    -r ui-image=ui-image
+}
 
-  sleep 5
-  demo.logs
+demo.url() {
+  local host=$(eval 'oc -n $NAMESPACE get route ui --template={{.spec.host}}')
+
+  echo "Click following URL to access the application"
+  echo -e "http://$host"
 }
 
 demo.help() {
@@ -126,6 +109,7 @@ demo.help() {
 		  setup     setups project, tasks, pipeline and resources
 		  run       starts pipeline
 		  logs      show logs of last pipelinerun
+		  url       provide the url of the application
 EOF
 
 }
