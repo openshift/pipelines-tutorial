@@ -67,8 +67,8 @@ demo.setup() {
   }
 
   info "Apply pipeline tasks"
-  sed -e "s|pipelines-tutorial|$NAMESPACE|g" pipeline/apply_manifest_task.yaml | OC apply -f -
-  sed -e "s|pipelines-tutorial|$NAMESPACE|g" pipeline/update_deployment_task.yaml | OC apply -f -
+  OC apply -f pipeline/apply_manifest_task.yaml
+  OC apply -f pipeline/update_deployment_task.yaml
 
   info "Applying resources"
   sed -e "s|pipelines-tutorial|$NAMESPACE|g" pipeline/resources.yaml | OC apply -f -
@@ -94,10 +94,10 @@ demo.run() {
 }
 
 demo.url() {
-  HOST=$(eval 'oc -n $NAMESPACE get route ui --template={{.spec.host}}')
+  local host=$(eval 'oc -n $NAMESPACE get route ui --template={{.spec.host}}')
 
   echo "Click following URL to access the application"
-  echo -e "http://$HOST"
+  echo -e "http://$host"
 }
 
 demo.help() {
