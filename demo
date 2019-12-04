@@ -95,7 +95,7 @@ demo.run() {
 
 demo.url() {
   echo "Click following URL to access the application"
-  OC get route ui --template='http://{{.spec.host}}'
+  oc -n $NAMESPACE get route ui --template='http://{{.spec.host}}'
 }
 
 demo.help() {
