@@ -94,10 +94,8 @@ demo.run() {
 }
 
 demo.url() {
-  local host=$(eval 'oc -n $NAMESPACE get route ui --template={{.spec.host}}')
-
   echo "Click following URL to access the application"
-  echo -e "http://$host"
+  OC get route ui --template='http://{{.spec.host}}'
 }
 
 demo.help() {

@@ -273,7 +273,7 @@ This pipeline performs the following:
 2. Builds the container image of frontend using the `s2i-python-3` task that generates a
    Dockerfile for the application using [Source-to-Image (S2I)](https://docs.openshift.com/container-platform/4.1/builds/understanding-image-builds.html#build-strategy-s2i_understanding-image-builds).
    and uses [Buildah](https://buildah.io/) to build the image
-3. Builds the container image of backend using the `buildah` task 
+3. Builds the container image of backend using the `buildah` task
    that uses [Buildah](https://buildah.io/) to build the image
 4. The application image is pushed to an image registry (`api-image` and `ui-image` resource)
 5. The new application image is deployed on OpenShift using the `apply-manifests` and `update-deployment` tasks.
@@ -444,7 +444,7 @@ Looking back at the project, you should see that the images are successfully bui
 You can get the route of the application by executing the following command and access the application
 
 ```bash
-HOST=$(eval 'oc get route ui --template={{.spec.host}}') && echo http://$HOST
+  oc get route ui --template='http://{{.spec.host}}'
 ```
 
 
