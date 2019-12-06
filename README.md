@@ -87,9 +87,11 @@ Make sure you are on the `pipelines-tutorial` project by selecting it from the *
 
 ![Projects](images/projects.png)
 
+<!--
 On the **Topology** view of the **Developer** perspective, you will be able to see the resources you just created.
 
 ![Projects](images/application-deployed.png)
+-->
 
 ## Install Tasks
 
@@ -297,15 +299,14 @@ $ oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/ma
 
 Alternatively, in the OpenShift web console, you can click on the **+** at the top right of the screen while you are in the **pipelines-tutorial** project:
 
-![OpenShift Console - Import Yaml 1](images/console-import-yaml-1.png)
+![OpenShift Console - Import Yaml](images/console-import-yaml.png)
 
-Paste the YAML into the text editor and click on **Create**:
-
-![OpenShift Console - Import Yaml 2](images/console-import-yaml-2.png)
-
-Upon creating the pipeline via the web console, you will be taken to a **Pipeline Details** page that gives an overview of the pipeline you created:
+Upon creating the pipeline via the web console, you will be taken to a **Pipeline Details** page that gives an overview of the pipeline you created.
+<!-- >
 
 ![OpenShift Console - Pipeline Details](images/pipeline-details.png)
+
+-->
 
 Check the list of pipelines you have created using the CLI:
 
