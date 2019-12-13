@@ -385,6 +385,13 @@ Create the above pipeline resources via the OpenShift web console or by running 
 $ oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/master/pipeline/resources.yaml
 ```
 
+> **Note** :-
+>
+>If you are not into the `pipelines-tutorial` namespace, and using another namespace for the tutorial steps, please make sure you update the
+frontend and backend image resource to the correct url with your namespace name like so :
+>
+>`image-registry.openshift-image-registry.svc:5000/<namespace-name>/api:latest`
+
 You can see the list of resources created using `tkn`:
 
 ```bash
