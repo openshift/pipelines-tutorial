@@ -6,6 +6,10 @@ To start, make sure you are on the **Administrator** perspective as shown below:
 
 ![Administrator Perspective](images/administrator.png)
 
+Go to **Administration > Namespaces** in the Web Console. Create a new namespace named `openshift-pipelines`. This is where the OpenShift Pipelines Operator Pods will run by default.
+
+![Create a Namespace](images/namespaces.png)
+
 Go to **Operators > OperatorHub** in the Web Console. You can see the list of available operators for OpenShift provided by Red Hat as well as a community of partners and open-source projects.
 
 ![OpenShift OperatorHub](images/operatorhub.png)
