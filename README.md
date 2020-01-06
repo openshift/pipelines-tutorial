@@ -146,22 +146,30 @@ We will be using `buildah` and`s2i-python-3` tasks also which gets installed alo
 ```
 $ tkn clustertask ls
 NAME                      AGE
-buildah                   9 hours ago
-buildah-v0-8-0            9 hours ago
-openshift-client          9 hours ago
-openshift-client-v0-8-0   9 hours ago
-s2i                       9 hours ago
-s2i-go                    9 hours ago
-s2i-go-v0-8-0             9 hours ago
-s2i-java-11               9 hours ago
-s2i-java-11-v0-8-0        9 hours ago
-s2i-java-8                9 hours ago
-s2i-java-8-v0-8-0         9 hours ago
-s2i-nodejs                9 hours ago
-s2i-nodejs-v0-8-0         9 hours ago
-s2i-python-3              9 hours ago
-s2i-python-3-v0-8-0       9 hours ago
-s2i-v0-8-0                9 hours ago
+buildah                   2 minutes ago
+buildah-v0-8-0            2 minutes ago
+buildah-v0-9-0            2 minutes ago
+openshift-client          2 minutes ago
+openshift-client-v0-8-0   2 minutes ago
+openshift-client-v0-9-0   2 minutes ago
+s2i                       2 minutes ago
+s2i-go                    2 minutes ago
+s2i-go-v0-8-0             2 minutes ago
+s2i-go-v0-9-0             2 minutes ago
+s2i-java-11               2 minutes ago
+s2i-java-11-v0-8-0        2 minutes ago
+s2i-java-11-v0-9-0        2 minutes ago
+s2i-java-8                2 minutes ago
+s2i-java-8-v0-8-0         2 minutes ago
+s2i-java-8-v0-9-0         2 minutes ago
+s2i-nodejs                2 minutes ago
+s2i-nodejs-v0-8-0         2 minutes ago
+s2i-nodejs-v0-9-0         2 minutes ago
+s2i-python-3              2 minutes ago
+s2i-python-3-v0-8-0       2 minutes ago
+s2i-python-3-v0-9-0       2 minutes ago
+s2i-v0-8-0                2 minutes ago
+s2i-v0-9-0                2 minutes ago
 ```
 
 ## Create Pipeline
