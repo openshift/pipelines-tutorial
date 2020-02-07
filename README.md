@@ -145,31 +145,29 @@ We will be using `buildah` and`s2i-python-3` tasks also which gets installed alo
 
 ```
 $ tkn clustertask ls
-NAME                      AGE
-buildah                   2 minutes ago
-buildah-v0-8-0            2 minutes ago
-buildah-v0-9-0            2 minutes ago
-openshift-client          2 minutes ago
-openshift-client-v0-8-0   2 minutes ago
-openshift-client-v0-9-0   2 minutes ago
-s2i                       2 minutes ago
-s2i-go                    2 minutes ago
-s2i-go-v0-8-0             2 minutes ago
-s2i-go-v0-9-0             2 minutes ago
-s2i-java-11               2 minutes ago
-s2i-java-11-v0-8-0        2 minutes ago
-s2i-java-11-v0-9-0        2 minutes ago
-s2i-java-8                2 minutes ago
-s2i-java-8-v0-8-0         2 minutes ago
-s2i-java-8-v0-9-0         2 minutes ago
-s2i-nodejs                2 minutes ago
-s2i-nodejs-v0-8-0         2 minutes ago
-s2i-nodejs-v0-9-0         2 minutes ago
-s2i-python-3              2 minutes ago
-s2i-python-3-v0-8-0       2 minutes ago
-s2i-python-3-v0-9-0       2 minutes ago
-s2i-v0-8-0                2 minutes ago
-s2i-v0-9-0                2 minutes ago
+NAME                       AGE
+buildah                    4 minutes ago
+buildah-v0-10-0            4 minutes ago
+openshift-client           4 minutes ago
+openshift-client-v0-10-0   4 minutes ago
+s2i                        4 minutes ago
+s2i-go                     4 minutes ago
+s2i-go-v0-10-0             4 minutes ago
+s2i-java-11                4 minutes ago
+s2i-java-11-v0-10-0        4 minutes ago
+s2i-java-8                 4 minutes ago
+s2i-java-8-v0-10-0         4 minutes ago
+s2i-nodejs                 4 minutes ago
+s2i-nodejs-v0-10-0         4 minutes ago
+s2i-perl                   4 minutes ago
+s2i-perl-v0-10-0           4 minutes ago
+s2i-php                    4 minutes ago
+s2i-php-v0-10-0            4 minutes ago
+s2i-python-3               4 minutes ago
+s2i-python-3-v0-10-0       4 minutes ago
+s2i-ruby                   4 minutes ago
+s2i-ruby-v0-10-0           4 minutes ago
+s2i-v0-10-0                4 minutes ago
 ```
 
 ## Create Pipeline
@@ -422,11 +420,10 @@ $ tkn pipeline start build-and-deploy
 ? Choose the git resource to use for ui-repo: ui-repo (http://github.com/openshift-pipelines/vote-ui.git)
 ? Choose the image resource to use for ui-image: ui-image (image-registry.openshift-image-registry.svc:5000/pipelines-tutorial/ui:latest)
 Pipelinerun started: build-and-deploy-run-z2rz8
-Showing logs...
 
+In order to track the pipelinerun progress run:
+tkn pipelinerun logs build-and-deploy-run-z2rz8 -f -n pipelines-tutorial
 ```
-
-And it will start streaming the logs of the pipeline we just trigered.
 
 As soon as you start the `build-and-deploy` pipeline, a pipelinerun will be instantiated and pods will be created to execute the tasks that are defined in the pipeline.
 
