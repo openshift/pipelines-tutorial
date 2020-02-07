@@ -26,10 +26,8 @@ After clicking **Subscribe**, you will be taken to the **Installed Operators** p
 
 ![OpenShift Pipelines Operator 3](images/operator-install-3.png)
 
-Click on **OpenShift Pipelines Operator** under the `Name` column and then click on **Create Instance**:
+That's all. The operator now installs OpenShift Pipelines on the cluster.
+
+You can confirm the following by checking tekton-pipelines and tekton-triggers pods with `Running` state in `openshift-pipelines` namespace. If so, openshift-pielines have been installed on your cluster.
 
 ![OpenShift Pipelines Operator 4](images/operator-install-4.png)
-
-Leave the default values in the **Create Config** editor and click **Create**.
-
-That's all. The operator now installs OpenShift Pipelines on the cluster.
