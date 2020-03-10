@@ -10,7 +10,6 @@ spec:
       - name: deployment
         description: The name of the deployment patch the image
         type: string
-
   steps:
     - name: patch
       image: quay.io/openshift/origin-cli:latest
