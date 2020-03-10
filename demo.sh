@@ -10,7 +10,6 @@ _log() {
     echo -e "$level: $@"
 }
 
-
 log.err() {
     _log "ERROR" "$@" >&2
 }
@@ -31,39 +30,51 @@ valid_command() {
   [[ $(type -t "$fn") == "function" ]]
 }
 
-execute() {
-  echo "Running:  '$@'"
-  ${DRY_RUN:-false} || "$@"
-}
-
 # helpers to avoid adding -n $NAMESPACE to oc and tkn
 OC() {
-  echo oc -n ${NAMESPACE} "$@"
-  oc -n ${NAMESPACE} "$@"
+  echo oc -n "$NAMESPACE" "$@"
+  oc -n "$NAMESPACE" "$@"
 }
 
 TKN() {
- echo tkn -n ${NAMESPACE} "$@"
- tkn -n ${NAMESPACE} "$@"
+ echo tkn -n "$NAMESPACE" "$@"
+ tkn -n "$NAMESPACE" "$@"
 }
 
-demo.validate() {
+demo.validate_tools() {
   info "validating tools"
 
   tkn version >/dev/null 2>&1 || err 1 "no tkn binary found"
-  oc version >/dev/null 2>&1 || err 1 "no oc binary found"
+  oc version --client >/dev/null 2>&1 || err 1 "no oc binary found"
   return 0
 }
 
-declare -r TASKS_DIR=tmp/tasks
+demo.validate_pipelinerun() {
+  local failed=0
+  local results=( $(oc get pipelinerun.tekton.dev -n "$NAMESPACE" --template='
+    {{range .items -}}
+      {{ $pr := .metadata.name -}}
+      {{ $c := index .status.conditions 0 -}}
+      {{ $pr }}={{ $c.type }}{{ $c.status }}
+    {{ end }}
+    ') )
+
+  for result in ${results[@]}; do
+    if [[ ! "${result,,}" == *"=succeededtrue" ]]; then
+      echo "ERROR: test $result but should be SucceededTrue"
+      failed=1
+    fi
+  done
+
+  return "$failed"
+}
 
 demo.setup() {
-  demo.validate
-
+  demo.validate_tools
 
   info "ensure namespace $NAMESPACE exists"
   OC get ns "$NAMESPACE" 2>/dev/null  || {
-    OC new-project $NAMESPACE
+    OC new-project "$NAMESPACE"
   }
 
   info "Apply pipeline tasks"
@@ -72,7 +83,7 @@ demo.setup() {
 
   info "Applying resources"
   sed -e "s|pipelines-tutorial|$NAMESPACE|g" pipeline/resources.yaml | OC apply -f -
-
+  
   info "Applying pipeline"
   OC apply -f pipeline/pipeline.yaml
 
@@ -86,16 +97,23 @@ demo.logs() {
 }
 
 demo.run() {
+  info "Starting the pipeline"
   TKN pipeline start build-and-deploy \
     -r api-repo=api-repo \
     -r api-image=api-image \
     -r ui-repo=ui-repo \
     -r ui-image=ui-image
+  
+  TKN pipeline logs -f --last
+
+  info "Validating the result of pipeline run"
+  demo.validate_pipelinerun
 }
 
 demo.url() {
   echo "Click following URL to access the application"
-  oc -n $NAMESPACE get route ui --template='http://{{.spec.host}}'
+  oc -n "$NAMESPACE" get route ui --template='http://{{.spec.host}}'
+  echo
 }
 
 demo.help() {
@@ -109,9 +127,7 @@ demo.help() {
 		  logs      show logs of last pipelinerun
 		  url       provide the url of the application
 EOF
-
 }
-
 
 main() {
   local fn="demo.${1:-help}"
@@ -120,7 +136,7 @@ main() {
     err  1 "invalid command '$1'"
   }
 
-  cd $SCRIPT_DIR
+  cd "$SCRIPT_DIR"
   $fn "$@"
   return $?
 }
