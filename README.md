@@ -95,7 +95,7 @@ On the **Topology** view of the **Developer** perspective, you will be able to s
 
 ## Install Tasks
 
-Tasks consist of a number of steps that are executed sequentially. Each task is executed in a separate container within the same pod. They can also have inputs and outputs in order to interact with other tasks in the pipeline.
+Tasks consist of a number of steps that are executed sequentially. Tasks are executed/run by creating TaskRuns. A TaskRun will schedule a Pod. Each step is executed in a separate container within the same pod. They can also have inputs and outputs in order to interact with other tasks in the pipeline.
 
 Here is an example of a Maven task for building a Maven-based Java application:
 
