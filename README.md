@@ -276,8 +276,8 @@ spec:
 ```
 
 This pipeline performs the following:
-1. Clones the source code of the frontend application from a git repository (`api-repo`
-   resource) and the backend application from a git repository (`ui-repo`resource)
+1. Clones the source code of the frontend application from a git repository (`ui-repo`
+   resource) and the backend application from a git repository (`api-repo`resource)
 2. Builds the container image of frontend using the `s2i-python-3` task that generates a
    Dockerfile for the application using [Source-to-Image (S2I)](https://docs.openshift.com/container-platform/4.1/builds/understanding-image-builds.html#build-strategy-s2i_understanding-image-builds).
    and uses [Buildah](https://buildah.io/) to build the image
