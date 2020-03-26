@@ -422,7 +422,7 @@ A `PipelineRun` is how you can start a pipeline and tie it to the git and image 
 $ tkn pipeline start build-and-deploy \
     -r git-repo=api-repo \
     -r image=api-image \
-    -p deployment-name=vote-api
+    -p deployment-name=api
 
 Pipelinerun started: build-and-deploy-run-z2rz8
 
@@ -434,7 +434,7 @@ tkn pipelinerun logs build-and-deploy-run-z2rz8 -f -n pipelines-tutorial
 $ tkn pipeline start build-and-deploy \
     -r git-repo=ui-repo \
     -r image=ui-image \
-    -p deployment-name=vote-ui
+    -p deployment-name=ui
 
 Pipelinerun started: build-and-deploy-run-xy7rw
 
