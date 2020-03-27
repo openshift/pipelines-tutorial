@@ -8,10 +8,10 @@ spec:
     type: git
   - name: image
     type: image
-  params:
-  - name: deployment-name
-    type: string
-    description: name of the deployment to be patched
+  # params:
+  # - name: deployment-name
+  #   type: string
+  #   description: name of the deployment to be patched
   tasks:
   - name: build-image
     taskRef:
@@ -36,15 +36,3 @@ spec:
         resource: git-repo
     runAfter:
     - build-image
-  - name: update-deployment
-    taskRef:
-      name: update-deployment
-    resources:
-      inputs:
-      - name: image
-        resource: image
-    params:
-    - name: deployment
-      value: $(params.deployment-name)
-    runAfter:
-    - apply-manifests
