@@ -132,13 +132,13 @@ Tasks consist of a number of steps that are executed sequentially. Tasks are exe
 Here is an example of a Maven task for building a Maven-based Java application:
 
 ```yaml
-apiVersion: tekton.dev/v1alpha1
+apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
   name: maven-build
 spec:
-  inputs:
-    resources:
+  resources:
+    inputs:
     - name: workspace-git
       targetPath: /
       type: git
@@ -217,7 +217,7 @@ In this tutorial, you will create a pipeline that takes the source code of the a
 Here is the YAML file that represents the above pipeline:
 
 ```yaml
-apiVersion: tekton.dev/v1alpha1
+apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
   name: build-and-deploy
@@ -518,7 +518,7 @@ A `TriggerTemplate` is a resource which have parameters that can be substituted 
 The definition of our TriggerTemplate is given in `03-triggers/02-template.yaml`.
 
 ```yaml
-apiVersion: tekton.dev/v1alpha1
+apiVersion: triggers.tekton.dev/v1alpha1
 kind: TriggerTemplate
 metadata:
   name: vote-app
@@ -555,7 +555,7 @@ spec:
       - name: url
         value: image-registry.openshift-image-registry.svc:5000/pipelines-tutorial/$(params.git-repo-name):latest
 
-  - apiVersion: tekton.dev/v1alpha1
+  - apiVersion: tekton.dev/v1beta1
     kind: PipelineRun
     metadata:
       name: build-deploy-$(params.git-repo-name)-$(uid)
@@ -588,7 +588,7 @@ TriggerBindings is a map enable you to capture fields from an event and store th
 The definition of our TriggerBinding is given in `03-triggers/01_binding.yaml`.
 
 ```yaml
-apiVersion: tekton.dev/v1alpha1
+apiVersion: triggers.tekton.dev/v1alpha1
 kind: TriggerBinding
 metadata:
   name: vote-app
@@ -620,7 +620,7 @@ The definition for our EventListener can be found in
 `03-triggers/03_event_listener.yaml`.
 
 ```yaml
-apiVersion: tekton.dev/v1alpha1
+apiVersion: triggers.tekton.dev/v1alpha1
 kind: EventListener
 metadata:
   name: vote-app

@@ -1,15 +1,15 @@
-apiVersion: tekton.dev/v1alpha1
+apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
   name: update-deployment
 spec:
-  inputs:
-    resources:
+  resources:
+    inputs:
       - {type: image, name: image}
-    params:
-      - name: deployment
-        description: The name of the deployment patch the image
-        type: string
+  params:
+    - name: deployment
+      description: The name of the deployment patch the image
+      type: string
   steps:
     - name: patch
       image: quay.io/openshift/origin-cli:latest
