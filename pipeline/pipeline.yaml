@@ -48,7 +48,7 @@ spec:
             resource: api-image
       params:
         - name: deployment
-          value: "api"
+          value: "vote-api"
       runAfter:
         - apply-api-manifests
 
@@ -87,6 +87,6 @@ spec:
             resource: ui-image
       params:
         - name: deployment
-          value: "ui"
+          value: "vote-ui"
       runAfter:
         - apply-ui-manifests
