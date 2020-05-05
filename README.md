@@ -175,35 +175,37 @@ update-deployment   4 seconds ago
 
 We will be using `buildah` clusterTasks, which gets installed along with Operator. Operator installs few ClusterTask which you can see.
 
-```
-$ tkn clustertask ls
-NAME                       AGE
-buildah                    4 minutes ago
-buildah-v0-10-0            4 minutes ago
-jib-maven                  4 minutes ago
-kn                         4 minutes ago
-maven                      4 minutes ago
-openshift-client           4 minutes ago
-openshift-client-v0-10-0   4 minutes ago
-s2i                        4 minutes ago
-s2i-go                     4 minutes ago
-s2i-go-v0-10-0             4 minutes ago
-s2i-java-11                4 minutes ago
-s2i-java-11-v0-10-0        4 minutes ago
-s2i-java-8                 4 minutes ago
-s2i-java-8-v0-10-0         4 minutes ago
-s2i-nodejs                 4 minutes ago
-s2i-nodejs-v0-10-0         4 minutes ago
-s2i-perl                   4 minutes ago
-s2i-perl-v0-10-0           4 minutes ago
-s2i-php                    4 minutes ago
-s2i-php-v0-10-0            4 minutes ago
-s2i-python-3               4 minutes ago
-s2i-python-3-v0-10-0       4 minutes ago
-s2i-ruby                   4 minutes ago
-s2i-ruby-v0-10-0           4 minutes ago
-s2i-v0-10-0                4 minutes ago
-tkn                        4 minutes ago
+```bash
+$ tkn clustertasks ls
+NAME                       DESCRIPTION   AGE
+buildah                                  1 day ago
+buildah-v0-11-3                          1 day ago
+jib-maven                                1 day ago
+kn                                       1 day ago
+maven                                    1 day ago
+openshift-client                         1 day ago
+openshift-client-v0-11-3                 1 day ago
+s2i                                      1 day ago
+s2i-dotnet-3                             1 day ago
+s2i-dotnet-3-v0-11-3                     1 day ago
+s2i-go                                   1 day ago
+s2i-go-v0-11-3                           1 day ago
+s2i-java-11                              1 day ago
+s2i-java-11-v0-11-3                      1 day ago
+s2i-java-8                               1 day ago
+s2i-java-8-v0-11-3                       1 day ago
+s2i-nodejs                               1 day ago
+s2i-nodejs-v0-11-3                       1 day ago
+s2i-perl                                 1 day ago
+s2i-perl-v0-11-3                         1 day ago
+s2i-php                                  1 day ago
+s2i-php-v0-11-3                          1 day ago
+s2i-python-3                             1 day ago
+s2i-python-3-v0-11-3                     1 day ago
+s2i-ruby                                 1 day ago
+s2i-ruby-v0-11-3                         1 day ago
+s2i-v0-11-3                              1 day ago
+tkn                                      1 day ago
 ```
 
 ## Create Pipeline
