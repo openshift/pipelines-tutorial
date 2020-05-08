@@ -8,6 +8,8 @@ spec:
   params:
   - name: url
     value: http://github.com/openshift-pipelines/vote-api.git
+  - name: revision
+    value: release-tech-preview-1
 ---
 apiVersion: tekton.dev/v1alpha1
 kind: PipelineResource
@@ -28,6 +30,8 @@ spec:
   params:
   - name: url
     value: http://github.com/openshift-pipelines/vote-ui.git
+  - name: revision
+    value: release-tech-preview-1
 ---
 apiVersion: tekton.dev/v1alpha1
 kind: PipelineResource
