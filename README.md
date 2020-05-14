@@ -158,9 +158,9 @@ Note that only the requirement for a git repository is declared on the task and 
 Install the `apply-manifests` and `update-deployment` tasks from the repository using `oc` or `kubectl`, which you will need for creating a pipeline in the next section:
 
 ```bash
-$ oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/master/01_pipeline/01_apply_manifest_task.yaml
+$ oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/release-tech-preview-1/01_pipeline/01_apply_manifest_task.yaml
 
-$ oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/master/01_pipeline/02_update_deployment_task.yaml
+$ oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/release-tech-preview-1/01_pipeline/02_update_deployment_task.yaml
 ```
 
 You can take a look at the tasks you created using the [Tekton CLI](https://github.com/tektoncd/cli/releases):
@@ -168,9 +168,9 @@ You can take a look at the tasks you created using the [Tekton CLI](https://gith
 ```
 $ tkn task ls
 
-NAME                AGE
-apply-manifests     10 seconds ago
-update-deployment   4 seconds ago
+NAME                DESCRIPTION   AGE
+apply-manifests                   59 seconds ago
+update-deployment                 22 seconds ago
 ```
 
 We will be using `buildah` clusterTasks, which gets installed along with Operator. Operator installs few ClusterTask which you can see.
@@ -178,34 +178,35 @@ We will be using `buildah` clusterTasks, which gets installed along with Operato
 ```bash
 $ tkn clustertasks ls
 NAME                       DESCRIPTION   AGE
-buildah                                  1 day ago
-buildah-v0-11-3                          1 day ago
-jib-maven                                1 day ago
-kn                                       1 day ago
-maven                                    1 day ago
-openshift-client                         1 day ago
-openshift-client-v0-11-3                 1 day ago
-s2i                                      1 day ago
-s2i-dotnet-3                             1 day ago
-s2i-dotnet-3-v0-11-3                     1 day ago
-s2i-go                                   1 day ago
-s2i-go-v0-11-3                           1 day ago
-s2i-java-11                              1 day ago
-s2i-java-11-v0-11-3                      1 day ago
-s2i-java-8                               1 day ago
-s2i-java-8-v0-11-3                       1 day ago
-s2i-nodejs                               1 day ago
-s2i-nodejs-v0-11-3                       1 day ago
-s2i-perl                                 1 day ago
-s2i-perl-v0-11-3                         1 day ago
-s2i-php                                  1 day ago
-s2i-php-v0-11-3                          1 day ago
-s2i-python-3                             1 day ago
-s2i-python-3-v0-11-3                     1 day ago
-s2i-ruby                                 1 day ago
-s2i-ruby-v0-11-3                         1 day ago
-s2i-v0-11-3                              1 day ago
-tkn                                      1 day ago
+buildah                                  23 hours ago
+buildah-v0-11-3                          23 hours ago
+git-clone                                23 hours ago
+jib-maven                                23 hours ago
+kn                                       23 hours ago
+maven                                    23 hours ago
+openshift-client                         23 hours ago
+openshift-client-v0-11-3                 23 hours ago
+s2i                                      23 hours ago
+s2i-dotnet-3                             23 hours ago
+s2i-dotnet-3-v0-11-3                     23 hours ago
+s2i-go                                   23 hours ago
+s2i-go-v0-11-3                           23 hours ago
+s2i-java-11                              23 hours ago
+s2i-java-11-v0-11-3                      23 hours ago
+s2i-java-8                               23 hours ago
+s2i-java-8-v0-11-3                       23 hours ago
+s2i-nodejs                               23 hours ago
+s2i-nodejs-v0-11-3                       23 hours ago
+s2i-perl                                 23 hours ago
+s2i-perl-v0-11-3                         23 hours ago
+s2i-php                                  23 hours ago
+s2i-php-v0-11-3                          23 hours ago
+s2i-python-3                             23 hours ago
+s2i-python-3-v0-11-3                     23 hours ago
+s2i-ruby                                 23 hours ago
+s2i-ruby-v0-11-3                         23 hours ago
+s2i-v0-11-3                              23 hours ago
+tkn                                      23 hours ago
 ```
 
 ## Create Pipeline
@@ -307,7 +308,7 @@ The execution order of task is determined by dependencies that are defined betwe
 Create the pipeline by running the following:
 
 ```bash
-$ oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/master/01_pipeline/04_pipeline.yaml
+$ oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/release-tech-preview-1/01_pipeline/04_pipeline.yaml
 ```
 
 Alternatively, in the OpenShift Web Console, you can click on the **+** at the top right of the screen while you are in the **pipelines-tutorial** project:
@@ -349,6 +350,8 @@ spec:
   params:
   - name: url
     value: http://github.com/openshift-pipelines/vote-ui.git
+  - name: revision
+    value: release-tech-preview-1
 ```
 
 And the following defines the OpenShift internal image registry for the frontend image to be pushed to:
@@ -377,6 +380,8 @@ spec:
   params:
   - name: url
     value: http://github.com/openshift-pipelines/vote-api.git
+  - name: revision
+    value: release-tech-preview-1
 ```
 
 And the following defines the OpenShift internal image registry for the backend image to be pushed to:
@@ -396,7 +401,7 @@ spec:
 Create the above pipeline resources via the OpenShift Web Console or by running the following:
 
 ```bash
-$ oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/master/01_pipeline/03_resources.yaml
+$ oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/release-tech-preview-1/01_pipeline/03_resources.yaml
 ```
 
 > **Note** :-
@@ -580,7 +585,7 @@ spec:
 * Run following command to apply Triggertemplate.
 
 ```bash
-$ oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/master/03_triggers/02_template.yaml
+$ oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/release-tech-preview-1/03_triggers/02_template.yaml
 ```
 
 
@@ -609,7 +614,7 @@ The exact paths (keys) of parameter we need can be found by examining the event 
 Run following command to apply Triggertemplate.
 
 ```bash
-$ oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/master/03_triggers/01_binding.yaml
+$ oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/release-tech-preview-1/03_triggers/01_binding.yaml
 ```
 
 #### Event Listener
@@ -637,7 +642,7 @@ spec:
 * Run following command to create Triggertemplate.
 
 ```bash
-$ oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/master/03_triggers/03_event_listener.yaml
+$ oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/release-tech-preview-1/03_triggers/03_event_listener.yaml
 ```
 
 >***Note***: EventListener will setup a Service. We need to expose that Service as an OpenShift Route to make it publicly accessible.
@@ -650,7 +655,7 @@ $ oc expose svc el-vote-app
 
 ## Configuring GitHub WebHooks
 
-Now we need to configure webhook-url on [backend](https://github.com/openshift-pipelines/vote-api) and [frontend](https://github.com/openshift-pipelines/vote-ui) source code repositories with the Route we exposed in the previously.
+Now we need to configure webhook-url on [backend](https://github.com/openshift-pipelines/vote-api/tree/release-tech-preview-1) and [frontend](https://github.com/openshift-pipelines/vote-ui/tree/release-tech-preview-1) source code repositories with the Route we exposed in the previously.
 
 * Run below command to get webhook-url
 ```bash
@@ -672,7 +677,7 @@ to payload URL > Select Content type as `application/json` > Add secret eg: `123
 
 ![Add webhook](docs/images/add-webhook.png)
 
-- Follow above procedure to configure webhook on [frontend](https://github.com/openshift-pipelines/vote-ui) repo
+- Follow above procedure to configure webhook on [frontend](https://github.com/openshift-pipelines/vote-ui/tree/release-tech-preview-1) repo
 
 Now we should see a webhook configured on your forked source code repositories (on our
 GitHub Repo, go to Settings>Webhooks).
@@ -683,7 +688,7 @@ GitHub Repo, go to Settings>Webhooks).
 
 #### Trigger pipeline Run
 
-When we perform any push event on the [backend](https://github.com/openshift-pipelines/vote-api) the following should happen.
+When we perform any push event on the [backend](https://github.com/openshift-pipelines/vote-api/tree/release-tech-preview-1) the following should happen.
 
 1.  The configured webhook in vote-api GitHub repository should push the event payload to our route (exposed EventListener Service).
 
@@ -696,12 +701,12 @@ We can test this by pushing a commit to vote-api repository from GitHub web ui o
 
 Let’s push an empty commit to vote-api repository.
 ```bash
-$ git commit -m "empty-commit" --allow-empty && git push origin master
+$ git commit -m "empty-commit" --allow-empty && git push origin release-tech-preview-1
 ...
 Writing objects: 100% (1/1), 190 bytes | 190.00 KiB/s, done.
 Total 1 (delta 0), reused 0 (delta 0)
 To github.com:<github-username>/vote-api.git
-   72c14bb..97d3115  master -> master
+   72c14bb..97d3115  release-tech-preview-1 -> release-tech-preview-1
 ```
 
 Watch OpenShift WebConsole Developer perspective and a PipelineRun will be automatically created.
