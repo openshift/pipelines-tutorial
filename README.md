@@ -137,6 +137,8 @@ kind: Task
 metadata:
   name: maven-build
 spec:
+  workspaces:
+   -name: filedrop
   resources:
     inputs:
     - name: workspace-git
@@ -151,7 +153,7 @@ spec:
     - install
 ```
 
-When a task starts running, it starts a pod and runs each step sequentially in a separate container on the same pod. This task happens to have a single step, but tasks can have multiple steps, and, since they run within the same pod, they have access to the same volumes in order to cache files, access configmaps, secrets, etc. As mentioned previously, tasks can receive inputs (e.g. a git repository) and produce outputs (e.g. an image in a registry).
+When a task starts running, it starts a pod and runs each step sequentially in a separate container on the same pod. This task happens to have a single step, but tasks can have multiple steps, and, since they run within the same pod, they have access to the same volumes in order to cache files, access configmaps, secrets, etc. As mentioned previously, tasks can receive inputs (e.g. a git repository) and produce outputs (e.g. an image in a registry). You can specify volume using workspace. It is recommended that Tasks uses at most one writeable Workspace
 
 Note that only the requirement for a git repository is declared on the task and not a specific git repository to be used. That allows tasks to be reusable for multiple pipelines and purposes. You can find more examples of reusable tasks in the [Tekton Catalog](https://github.com/tektoncd/catalog) and [OpenShift Catalog](https://github.com/openshift/pipelines-catalog) repositories.
 
@@ -224,49 +226,72 @@ kind: Pipeline
 metadata:
   name: build-and-deploy
 spec:
-  resources:
-  - name: git-repo
-    type: git
-  - name: image
-    type: image
+  workspaces:
+  - name: shared-workspace
   params:
   - name: deployment-name
     type: string
     description: name of the deployment to be patched
+  - name: git-url
+    type: string
+    description: url of the git repo for the code of deployment
+  - name: git-revision
+    type: string
+    description: revision to be used from repo of the code for deployment
+    default: "master"
+  - name: IMAGE
+    type: string
+    description: image to be build from the code
   tasks:
+  - name: fetch-repository
+    taskRef:
+      name: git-clone
+      kind: ClusterTask
+    workspaces:
+    - name: output
+      workspace: shared-workspace
+    params:
+    - name: url
+      value: $(params.git-url)
+    - name: subdirectory
+      value: ""
+    - name: deleteExisting
+      value: "true"
+    - name: revision
+      value: $(params.git-revision)
   - name: build-image
     taskRef:
       name: buildah
       kind: ClusterTask
-    resources:
-      inputs:
-      - name: source
-        resource: git-repo
-      outputs:
-      - name: image
-        resource: image
     params:
     - name: TLSVERIFY
       value: "false"
+    - name: IMAGE
+      value: $(params.IMAGE)
+    workspaces:
+    - name: source
+      workspace: shared-workspace
+    runAfter:
+    - fetch-repository
   - name: apply-manifests
     taskRef:
       name: apply-manifests
-    resources:
-      inputs:
-      - name: source
-        resource: git-repo
+    workspaces:
+    - name: source
+      workspace: shared-workspace
     runAfter:
     - build-image
   - name: update-deployment
     taskRef:
       name: update-deployment
-    resources:
-      inputs:
-      - name: image
-        resource: image
+    workspaces:
+    - name: source
+      workspace: shared-workspace
     params:
     - name: deployment
       value: $(params.deployment-name)
+    - name: IMAGE
+      value: $(params.IMAGE)
     runAfter:
     - apply-manifests
 ```
@@ -304,6 +329,8 @@ the next section.
 
 The execution order of task is determined by dependencies that are defined between the tasks via inputs and outputs as well as explicit orders that are defined via `runAfter`.
 
+`workspaces` field allow you to specify one or more volumes that each Task in the Pipeline requires during execution. You specify one or more Workspaces in the `workspaces` field.
+
 Create the pipeline by running the following:
 
 ```bash
@@ -335,69 +362,7 @@ build-and-deploy   1 minute ago   ---        ---       ---        ---
 Now that the pipeline is created, you can trigger it to execute the tasks
 specified in the pipeline.
 
-First, you should create a number of `PipelineResources` that contain the specifics of the git repository and image registry to be used in the pipeline during execution. Expectedly, these are also reusable across multiple pipelines.
 
-The following `PipelineResource` defines the git repository for the frontend application:
-
-```yaml
-apiVersion: tekton.dev/v1alpha1
-kind: PipelineResource
-metadata:
-  name: ui-repo
-spec:
-  type: git
-  params:
-  - name: url
-    value: http://github.com/openshift-pipelines/vote-ui.git
-```
-
-And the following defines the OpenShift internal image registry for the frontend image to be pushed to:
-
-```yaml
-apiVersion: tekton.dev/v1alpha1
-kind: PipelineResource
-metadata:
-  name: ui-image
-spec:
-  type: image
-  params:
-  - name: url
-    value: image-registry.openshift-image-registry.svc:5000/pipelines-tutorial/vote-ui:latest
-```
-
-And the following `PipelineResource` defines the git repository for the backend application:
-
-```yaml
-apiVersion: tekton.dev/v1alpha1
-kind: PipelineResource
-metadata:
-  name: api-repo
-spec:
-  type: git
-  params:
-  - name: url
-    value: http://github.com/openshift-pipelines/vote-api.git
-```
-
-And the following defines the OpenShift internal image registry for the backend image to be pushed to:
-
-```yaml
-apiVersion: tekton.dev/v1alpha1
-kind: PipelineResource
-metadata:
-  name: api-image
-spec:
-  type: image
-  params:
-  - name: url
-    value: image-registry.openshift-image-registry.svc:5000/pipelines-tutorial/vote-api:latest
-```
-
-Create the above pipeline resources via the OpenShift Web Console or by running the following:
-
-```bash
-$ oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/master/01_pipeline/03_resources.yaml
-```
 
 > **Note** :-
 >
@@ -422,9 +387,12 @@ A `PipelineRun` is how you can start a pipeline and tie it to the git and image 
 
 ```bash
 $ tkn pipeline start build-and-deploy \
-    -r git-repo=api-repo \
+    -w name=shared-workspace,claimName=source-pvc \
     -r image=api-image \
-    -p deployment-name=vote-api
+    -p deployment-name=vote-api \
+    -p git-url=http://github.com/openshift-pipelines/vote-api.git \
+    -p IMAGE=image-registry.openshift-image-registry.svc:5000/pipelines-tutorial/vote-api \
+    --showlog=true
 
 Pipelinerun started: build-and-deploy-run-z2rz8
 
@@ -434,9 +402,12 @@ tkn pipelinerun logs build-and-deploy-run-z2rz8 -f -n pipelines-tutorial
 
 ```bash
 $ tkn pipeline start build-and-deploy \
-    -r git-repo=ui-repo \
-    -r image=ui-image \
-    -p deployment-name=vote-ui
+    -w name=shared-workspace,claimName=source-pvc \
+    -r image=api-image \
+    -p deployment-name=vote-api \
+    -p git-url=http://github.com/openshift-pipelines/vote-ui.git \
+    -p IMAGE=image-registry.openshift-image-registry.svc:5000/pipelines-tutorial/vote-ui \
+    --showlog=true
 
 Pipelinerun started: build-and-deploy-run-xy7rw
 

@@ -45,7 +45,7 @@ demo.validate_tools() {
   info "validating tools"
 
   tkn version >/dev/null 2>&1 || err 1 "no tkn binary found"
-  oc version --client >/dev/null 2>&1 || err 1 "no oc binary found"
+  oc version  >/dev/null 2>&1 || err 1 "no oc binary found"
   return 0
 }
 
@@ -93,11 +93,11 @@ demo.setup-pipeline() {
   OC apply -f 01_pipeline/01_apply_manifest_task.yaml
   OC apply -f 01_pipeline/02_update_deployment_task.yaml
 
-  info "Applying resources"
-  sed -e "s|pipelines-tutorial|$NAMESPACE|g" 01_pipeline/03_resources.yaml | OC apply -f -
-
   info "Applying pipeline"
   OC apply -f 01_pipeline/04_pipeline.yaml
+
+  info "Creating workspace"
+  OC apply -f 01_pipeline/05_persistent_volume_claim.yaml
 
   echo -e "\nPipeline"
   echo "==============="
@@ -118,16 +118,20 @@ demo.logs() {
 demo.run() {
   info "Running API Build and deploy"
   TKN pipeline start build-and-deploy \
-    -r git-repo=api-repo \
+    -w name=shared-workspace,claimName=source-pvc \
     -r image=api-image \
     -p deployment-name=vote-api \
+    -p git-url=http://github.com/openshift-pipelines/vote-api.git \
+    -p IMAGE=image-registry.openshift-image-registry.svc:5000/pipelines-tutorial/vote-api \
     --showlog=true
 
   info "Running UI Build and deploy"
   TKN pipeline start build-and-deploy \
-    -r git-repo=ui-repo \
+    -w name=shared-workspace,claimName=source-pvc \
     -r image=ui-image \
     -p deployment-name=vote-ui \
+    -p git-url=http://github.com/openshift-pipelines/vote-ui.git \
+    -p IMAGE=image-registry.openshift-image-registry.svc:5000/pipelines-tutorial/vote-ui \
     --showlog=true
 
   info "Validating the result of pipeline run"

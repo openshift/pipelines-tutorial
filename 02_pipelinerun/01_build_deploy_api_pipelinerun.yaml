@@ -6,12 +6,17 @@ spec:
   pipelineRef:
     name: build-and-deploy
   resources:
-  - name: git-repo
-    resourceRef:
-      name: api-repo
   - name: image
     resourceRef:
       name: api-image
   params:
   - name: deployment-name
     value: vote-api
+  - name: git-url
+    value: http://github.com/openshift-pipelines/vote-api.git
+  - name: IMAGE
+    value: image-registry.openshift-image-registry.svc:5000/pipelines-tutorial/vote-api
+  workspaces:
+  - name: shared-workspace
+    persistentvolumeclaim:
+      claimName: source-pvc

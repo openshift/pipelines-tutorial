@@ -44,12 +44,17 @@ spec:
       pipelineRef:
         name: build-and-deploy
       resources:
-      - name: git-repo
-        resourceRef:
-          name: $(params.git-repo-name)-git-repo-$(uid)
       - name: image
         resourceRef:
           name: $(params.git-repo-name)-image-$(uid)
       params:
       - name: deployment-name
         value: $(params.git-repo-name)
+      - name: git-url
+        value: $(params.git-repo-url)
+      - name: git-revision
+        value: $(params.git-revision)
+      workspaces:
+      - name: shared-workspace
+        persistentvolumeclaim:
+          claimName: source-pvc
