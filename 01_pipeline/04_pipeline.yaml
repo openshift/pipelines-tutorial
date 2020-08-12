@@ -3,48 +3,68 @@ kind: Pipeline
 metadata:
   name: build-and-deploy
 spec:
-  resources:
-  - name: git-repo
-    type: git
-  - name: image
-    type: image
+  workspaces:
+  - name: shared-workspace
   params:
   - name: deployment-name
     type: string
     description: name of the deployment to be patched
+  - name: git-url
+    type: string
+    description: url of the git repo for the code of deployment
+  - name: git-revision
+    type: string
+    description: revision to be used from repo of the code for deployment
+    default: "master"
+  - name: IMAGE
+    type: string
+    description: image to be build from the code
   tasks:
+  - name: fetch-repository
+    taskRef:
+      name: git-clone
+      kind: ClusterTask
+    workspaces:
+    - name: output
+      workspace: shared-workspace
+    params:
+    - name: url
+      value: $(params.git-url)
+    - name: subdirectory
+      value: ""
+    - name: deleteExisting
+      value: "true"
+    - name: revision
+      value: $(params.git-revision)
   - name: build-image
     taskRef:
       name: buildah
       kind: ClusterTask
-    resources:
-      inputs:
-      - name: source
-        resource: git-repo
-      outputs:
-      - name: image
-        resource: image
     params:
     - name: TLSVERIFY
       value: "false"
+    - name: IMAGE
+      value: $(params.IMAGE)
+    workspaces:
+    - name: source
+      workspace: shared-workspace
+    runAfter:
+    - fetch-repository
   - name: apply-manifests
     taskRef:
       name: apply-manifests
-    resources:
-      inputs:
-      - name: source
-        resource: git-repo
+    workspaces:
+    - name: source
+      workspace: shared-workspace
     runAfter:
     - build-image
   - name: update-deployment
     taskRef:
       name: update-deployment
-    resources:
-      inputs:
-      - name: image
-        resource: image
     params:
     - name: deployment
       value: $(params.deployment-name)
+    - name: IMAGE
+      value: $(params.IMAGE)
     runAfter:
     - apply-manifests

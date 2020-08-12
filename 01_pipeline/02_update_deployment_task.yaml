@@ -3,12 +3,12 @@ kind: Task
 metadata:
   name: update-deployment
 spec:
-  resources:
-    inputs:
-      - {type: image, name: image}
   params:
     - name: deployment
       description: The name of the deployment patch the image
+      type: string
+    - name: IMAGE
+      description: Location of image to be patched with
       type: string
   steps:
     - name: patch
@@ -19,6 +19,6 @@ spec:
           oc patch deployment $(inputs.params.deployment) --patch='{"spec":{"template":{"spec":{
             "containers":[{
               "name": "$(inputs.params.deployment)",
-              "image":"$(inputs.resources.image.url)"
+              "image":"$(inputs.params.IMAGE)"
             }]
           }}}}'
