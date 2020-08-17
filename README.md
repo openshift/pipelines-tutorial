@@ -151,9 +151,9 @@ Note that only the requirement for a git repository is declared on the task and 
 Install the `apply-manifests` and `update-deployment` tasks from the repository using `oc` or `kubectl`, which you will need for creating a pipeline in the next section:
 
 ```bash
-$ oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/master/01_pipeline/01_apply_manifest_task.yaml
+$ oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/release-tech-preview-2/01_pipeline/01_apply_manifest_task.yaml
 
-$ oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/master/01_pipeline/02_update_deployment_task.yaml
+$ oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/release-tech-preview-2/01_pipeline/02_update_deployment_task.yaml
 ```
 
 You can take a look at the tasks you created using the [Tekton CLI](https://github.com/tektoncd/cli/releases):
@@ -206,7 +206,7 @@ spec:
   - name: git-revision
     type: string
     description: revision to be used from repo of the code for deployment
-    default: "master"
+    default: "release-tech-preview-2"
   - name: IMAGE
     type: string
     description: image to be build from the code
@@ -297,12 +297,12 @@ the next section.
 
 The execution order of task is determined by dependencies that are defined between the tasks via inputs and outputs as well as explicit orders that are defined via `runAfter`.
 
-`workspaces` field allow you to specify one or more volumes that each Task in the Pipeline requires during execution. You specify one or more Workspaces in the `workspaces` field.
+The `workspaces` field allow you to specify one or more volumes that each Task in the Pipeline requires during execution. You specify one or more Workspaces in the `workspaces` field.
 
 Create the pipeline by running the following:
 
 ```bash
-$ oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/master/01_pipeline/04_pipeline.yaml
+$ oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/release-tech-preview-2/01_pipeline/04_pipeline.yaml
 ```
 
 Alternatively, in the OpenShift Web Console, you can click on the **+** at the top right of the screen while you are in the **pipelines-tutorial** project:
@@ -465,7 +465,7 @@ spec:
     description: The git repository url
   - name: git-revision
     description: The git revision
-    default: master
+    default: release-tech-preview-2
   - name: git-repo-name
     description: The name of the deployment to be created / patched
 
@@ -496,7 +496,7 @@ spec:
 * Run following command to apply Triggertemplate.
 
 ```bash
-$ oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/master/03_triggers/02_template.yaml
+$ oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/release-tech-preview-2/03_triggers/02_template.yaml
 ```
 
 
@@ -525,7 +525,7 @@ The exact paths (keys) of parameter we need can be found by examining the event 
 Run following command to apply Triggertemplate.
 
 ```bash
-$ oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/master/03_triggers/01_binding.yaml
+$ oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/release-tech-preview-2/03_triggers/01_binding.yaml
 ```
 
 #### Event Listener
@@ -553,7 +553,7 @@ spec:
 * Run following command to create Triggertemplate.
 
 ```bash
-$ oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/master/03_triggers/03_event_listener.yaml
+$ oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/release-tech-preview-2/03_triggers/03_event_listener.yaml
 ```
 
 >***Note***: EventListener will setup a Service. We need to expose that Service as an OpenShift Route to make it publicly accessible.
@@ -612,12 +612,12 @@ We can test this by pushing a commit to vote-api repository from GitHub web ui o
 
 Let’s push an empty commit to vote-api repository.
 ```bash
-$ git commit -m "empty-commit" --allow-empty && git push origin master
+$ git commit -m "empty-commit" --allow-empty && git push origin release-tech-preview-2
 ...
 Writing objects: 100% (1/1), 190 bytes | 190.00 KiB/s, done.
 Total 1 (delta 0), reused 0 (delta 0)
 To github.com:<github-username>/vote-api.git
-   72c14bb..97d3115  master -> master
+   72c14bb..97d3115  release-tech-preview-2 -> release-tech-preview-2
 ```
 
 Watch OpenShift WebConsole Developer perspective and a PipelineRun will be automatically created.
