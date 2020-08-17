@@ -37,7 +37,6 @@ Tekton defines a number of [Kubernetes custom resources](https://kubernetes.io/d
 The custom resources needed to define a pipeline are listed below:
 * `Task`: a reusable, loosely coupled number of steps that perform a specific task (e.g. building a container image)
 * `Pipeline`: the definition of the pipeline and the `Tasks` that it should perform
-* `PipelineResource`: inputs (e.g. git repository) and outputs (e.g. image registry) to and out of a pipeline or task
 * `TaskRun`: the execution and result of running an instance of task
 * `PipelineRun`: the execution and result of running an instance of pipeline, which includes a number of `TaskRuns`
 
@@ -54,12 +53,9 @@ The Tekton API enables functionality to be separated from configuration (e.g.
 [Pipelines](https://github.com/tektoncd/pipeline/blob/master/docs/pipelines.md)
 vs
 [PipelineRuns](https://github.com/tektoncd/pipeline/blob/master/docs/pipelineruns.md))
-such that steps can be reusable, but it does not provide a mechanism to generate
-the resources (notably,
-[PipelineRuns](https://github.com/tektoncd/pipeline/blob/master/docs/pipelineruns.md)
-and
-[PipelineResources](https://github.com/tektoncd/pipeline/blob/master/docs/resources.md#pipelineresources))
-that encapsulate these configurations dynamically. Triggers extends the Tekton
+such that steps can be reusable.
+
+Triggers extends the Tekton
 architecture with the following CRDs:
 
 - [`TriggerTemplate`](https://github.com/tektoncd/triggers/blob/master/docs/triggertemplates.md) - Templates resources to be
@@ -137,11 +133,8 @@ kind: Task
 metadata:
   name: maven-build
 spec:
-  resources:
-    inputs:
-    - name: workspace-git
-      targetPath: /
-      type: git
+  workspaces:
+   -name: filedrop
   steps:
   - name: build
     image: maven:3.6.0-jdk-8-slim
@@ -151,7 +144,7 @@ spec:
     - install
 ```
 
-When a task starts running, it starts a pod and runs each step sequentially in a separate container on the same pod. This task happens to have a single step, but tasks can have multiple steps, and, since they run within the same pod, they have access to the same volumes in order to cache files, access configmaps, secrets, etc. As mentioned previously, tasks can receive inputs (e.g. a git repository) and produce outputs (e.g. an image in a registry).
+When a task starts running, it starts a pod and runs each step sequentially in a separate container on the same pod. This task happens to have a single step, but tasks can have multiple steps, and, since they run within the same pod, they have access to the same volumes in order to cache files, access configmaps, secrets, etc. You can specify volume using workspace. It is recommended that Tasks uses at most one writeable Workspace. Workspace can be secret, pvc, config or emptyDir.
 
 Note that only the requirement for a git repository is declared on the task and not a specific git repository to be used. That allows tasks to be reusable for multiple pipelines and purposes. You can find more examples of reusable tasks in the [Tekton Catalog](https://github.com/tektoncd/catalog) and [OpenShift Catalog](https://github.com/openshift/pipelines-catalog) repositories.
 
@@ -179,32 +172,9 @@ We will be using `buildah` clusterTasks, which gets installed along with Operato
 $ tkn clustertasks ls
 NAME                       DESCRIPTION   AGE
 buildah                                  1 day ago
-buildah-v0-11-3                          1 day ago
-jib-maven                                1 day ago
-kn                                       1 day ago
-maven                                    1 day ago
-openshift-client                         1 day ago
-openshift-client-v0-11-3                 1 day ago
-s2i                                      1 day ago
-s2i-dotnet-3                             1 day ago
-s2i-dotnet-3-v0-11-3                     1 day ago
-s2i-go                                   1 day ago
-s2i-go-v0-11-3                           1 day ago
-s2i-java-11                              1 day ago
-s2i-java-11-v0-11-3                      1 day ago
-s2i-java-8                               1 day ago
-s2i-java-8-v0-11-3                       1 day ago
-s2i-nodejs                               1 day ago
-s2i-nodejs-v0-11-3                       1 day ago
-s2i-perl                                 1 day ago
-s2i-perl-v0-11-3                         1 day ago
+buildah-v0-14-3                          1 day ago
+git-clone                                1 day ago
 s2i-php                                  1 day ago
-s2i-php-v0-11-3                          1 day ago
-s2i-python-3                             1 day ago
-s2i-python-3-v0-11-3                     1 day ago
-s2i-ruby                                 1 day ago
-s2i-ruby-v0-11-3                         1 day ago
-s2i-v0-11-3                              1 day ago
 tkn                                      1 day ago
 ```
 
@@ -224,49 +194,72 @@ kind: Pipeline
 metadata:
   name: build-and-deploy
 spec:
-  resources:
-  - name: git-repo
-    type: git
-  - name: image
-    type: image
+  workspaces:
+  - name: shared-workspace
   params:
   - name: deployment-name
     type: string
     description: name of the deployment to be patched
+  - name: git-url
+    type: string
+    description: url of the git repo for the code of deployment
+  - name: git-revision
+    type: string
+    description: revision to be used from repo of the code for deployment
+    default: "master"
+  - name: IMAGE
+    type: string
+    description: image to be build from the code
   tasks:
+  - name: fetch-repository
+    taskRef:
+      name: git-clone
+      kind: ClusterTask
+    workspaces:
+    - name: output
+      workspace: shared-workspace
+    params:
+    - name: url
+      value: $(params.git-url)
+    - name: subdirectory
+      value: ""
+    - name: deleteExisting
+      value: "true"
+    - name: revision
+      value: $(params.git-revision)
   - name: build-image
     taskRef:
       name: buildah
       kind: ClusterTask
-    resources:
-      inputs:
-      - name: source
-        resource: git-repo
-      outputs:
-      - name: image
-        resource: image
     params:
     - name: TLSVERIFY
       value: "false"
+    - name: IMAGE
+      value: $(params.IMAGE)
+    workspaces:
+    - name: source
+      workspace: shared-workspace
+    runAfter:
+    - fetch-repository
   - name: apply-manifests
     taskRef:
       name: apply-manifests
-    resources:
-      inputs:
-      - name: source
-        resource: git-repo
+    workspaces:
+    - name: source
+      workspace: shared-workspace
     runAfter:
     - build-image
   - name: update-deployment
     taskRef:
       name: update-deployment
-    resources:
-      inputs:
-      - name: image
-        resource: image
+    workspaces:
+    - name: source
+      workspace: shared-workspace
     params:
     - name: deployment
       value: $(params.deployment-name)
+    - name: IMAGE
+      value: $(params.IMAGE)
     runAfter:
     - apply-manifests
 ```
@@ -304,6 +297,8 @@ the next section.
 
 The execution order of task is determined by dependencies that are defined between the tasks via inputs and outputs as well as explicit orders that are defined via `runAfter`.
 
+`workspaces` field allow you to specify one or more volumes that each Task in the Pipeline requires during execution. You specify one or more Workspaces in the `workspaces` field.
+
 Create the pipeline by running the following:
 
 ```bash
@@ -335,69 +330,7 @@ build-and-deploy   1 minute ago   ---        ---       ---        ---
 Now that the pipeline is created, you can trigger it to execute the tasks
 specified in the pipeline.
 
-First, you should create a number of `PipelineResources` that contain the specifics of the git repository and image registry to be used in the pipeline during execution. Expectedly, these are also reusable across multiple pipelines.
 
-The following `PipelineResource` defines the git repository for the frontend application:
-
-```yaml
-apiVersion: tekton.dev/v1alpha1
-kind: PipelineResource
-metadata:
-  name: ui-repo
-spec:
-  type: git
-  params:
-  - name: url
-    value: http://github.com/openshift-pipelines/vote-ui.git
-```
-
-And the following defines the OpenShift internal image registry for the frontend image to be pushed to:
-
-```yaml
-apiVersion: tekton.dev/v1alpha1
-kind: PipelineResource
-metadata:
-  name: ui-image
-spec:
-  type: image
-  params:
-  - name: url
-    value: image-registry.openshift-image-registry.svc:5000/pipelines-tutorial/vote-ui:latest
-```
-
-And the following `PipelineResource` defines the git repository for the backend application:
-
-```yaml
-apiVersion: tekton.dev/v1alpha1
-kind: PipelineResource
-metadata:
-  name: api-repo
-spec:
-  type: git
-  params:
-  - name: url
-    value: http://github.com/openshift-pipelines/vote-api.git
-```
-
-And the following defines the OpenShift internal image registry for the backend image to be pushed to:
-
-```yaml
-apiVersion: tekton.dev/v1alpha1
-kind: PipelineResource
-metadata:
-  name: api-image
-spec:
-  type: image
-  params:
-  - name: url
-    value: image-registry.openshift-image-registry.svc:5000/pipelines-tutorial/vote-api:latest
-```
-
-Create the above pipeline resources via the OpenShift Web Console or by running the following:
-
-```bash
-$ oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/master/01_pipeline/03_resources.yaml
-```
 
 > **Note** :-
 >
@@ -422,9 +355,10 @@ A `PipelineRun` is how you can start a pipeline and tie it to the git and image 
 
 ```bash
 $ tkn pipeline start build-and-deploy \
-    -r git-repo=api-repo \
-    -r image=api-image \
-    -p deployment-name=vote-api
+    -w name=shared-workspace,claimName=source-pvc \
+    -p deployment-name=vote-api \
+    -p git-url=http://github.com/openshift-pipelines/vote-api.git \
+    -p IMAGE=image-registry.openshift-image-registry.svc:5000/pipelines-tutorial/vote-api \
 
 Pipelinerun started: build-and-deploy-run-z2rz8
 
@@ -434,9 +368,10 @@ tkn pipelinerun logs build-and-deploy-run-z2rz8 -f -n pipelines-tutorial
 
 ```bash
 $ tkn pipeline start build-and-deploy \
-    -r git-repo=ui-repo \
-    -r image=ui-image \
-    -p deployment-name=vote-ui
+    -w name=shared-workspace,claimName=source-pvc \
+    -p deployment-name=vote-api \
+    -p git-url=http://github.com/openshift-pipelines/vote-ui.git \
+    -p IMAGE=image-registry.openshift-image-registry.svc:5000/pipelines-tutorial/vote-ui \
 
 Pipelinerun started: build-and-deploy-run-xy7rw
 
@@ -535,46 +470,27 @@ spec:
     description: The name of the deployment to be created / patched
 
   resourcetemplates:
-  - apiVersion: tekton.dev/v1alpha1
-    kind: PipelineResource
-    metadata:
-      name: $(params.git-repo-name)-git-repo-$(uid)
-    spec:
-      type: git
-      params:
-      - name: revision
-        value: $(params.git-revision)
-      - name: url
-        value: $(params.git-repo-url)
-
-  - apiVersion: tekton.dev/v1alpha1
-    kind: PipelineResource
-    metadata:
-      name: $(params.git-repo-name)-image-$(uid)
-    spec:
-      type: image
-      params:
-      - name: url
-        value: image-registry.openshift-image-registry.svc:5000/pipelines-tutorial/$(params.git-repo-name):latest
-
   - apiVersion: tekton.dev/v1beta1
     kind: PipelineRun
     metadata:
-      name: build-deploy-$(params.git-repo-name)-$(uid)
+      name: build-deploy-$(tt.params.git-repo-name)-$(uid)
     spec:
       serviceAccountName: pipeline
       pipelineRef:
         name: build-and-deploy
-      resources:
-      - name: git-repo
-        resourceRef:
-          name: $(params.git-repo-name)-git-repo-$(uid)
-      - name: image
-        resourceRef:
-          name: $(params.git-repo-name)-image-$(uid)
       params:
       - name: deployment-name
-        value: $(params.git-repo-name)
+        value: $(tt.params.git-repo-name)
+      - name: git-url
+        value: $(tt.params.git-repo-url)
+      - name: git-revision
+        value: $(tt.params.git-revision)
+      - name: IMAGE
+        value: image-registry.openshift-image-registry.svc:5000/pipelines-tutorial/$(tt.params.git-repo-name)
+      workspaces:
+      - name: shared-workspace
+        persistentvolumeclaim:
+          claimName: source-pvc
 ```
 
 * Run following command to apply Triggertemplate.
