@@ -45,6 +45,7 @@ The custom resources needed to define a pipeline are listed below:
 In short, in order to create a pipeline, one does the following:
 * Create custom or install [existing](https://github.com/tektoncd/catalog) reusable `Tasks`
 * Create a `Pipeline` and `PipelineResources` to define your application's delivery pipeline
+* Create a `PersistentVolumeClaim` to provide the volume/filesystem for pipeline execution
 * Create a `PipelineRun` to instantiate and invoke the pipeline
 
 For further details on pipeline concepts, refer to the [Tekton documentation](https://github.com/tektoncd/pipeline/tree/master/docs#learn-more) that provides an excellent guide for understanding various parameters and attributes available for defining pipelines.
@@ -269,28 +270,19 @@ Once you deploy the pipelines, you should be able to visualize pipeline flow  in
 
 This pipeline helps you to build and deploy backend/frontend, by configuring right resources to pipeline.
 
-Backend:
+Pipeline Steps:
 
-  1. Clones the source code of the backend application from a git repository when  (`git-repo` git resource) refered to `api-repo`
-  2. Builds the container image of backend using the `buildah` clustertask
+  1. Clones the source code of the application from a git repository by referring (`git-url` and `git-revision` param)
+  2. Builds the container image of application using the `buildah` clustertask
   that uses [Buildah](https://buildah.io/) to build the image
-  3. The application image is pushed to an image registry by refering (`image` image resource) to `api-image`
-  4. The new backend application image is deployed on OpenShift using the `apply-manifests` and `update-deployment` tasks.
-
-Frontend:
-
-  1. Clones the source code of the backend application from a git repository when  (`git-repo` git resource) refered to `ui-repo`
-  2. Builds the container image of backend using the `buildah` clustertask
-  that uses [Buildah](https://buildah.io/) to build the image
-  3. The application image is pushed to an image registry by refering (`image` image resource) to `ui-image`
-  4. The new backend application image is deployed on OpenShift using the `apply-manifests` and `update-deployment` tasks.
-
+  3. The application image is pushed to an image registry by refering (`image` param)
+  4. The new application image is deployed on OpenShift using the `apply-manifests` and `update-deployment` tasks.
 
 You might have noticed that there are no references to the git
 repository or the image registry it will be pushed to in pipeline. That's because pipeline in Tekton
 are designed to be generic and re-usable across environments and stages through
 the application's lifecycle. Pipelines abstract away the specifics of the git
-source repository and image to be produced as `PipelineResources`. When triggering a
+source repository and image to be produced as `PipelineResources` or `Params`. When triggering a
 pipeline, you can provide different git repositories and image registries to be
 used during pipeline execution. Be patient! You will do that in a little bit in
 the next section.
@@ -330,8 +322,6 @@ build-and-deploy   1 minute ago   ---        ---       ---        ---
 Now that the pipeline is created, you can trigger it to execute the tasks
 specified in the pipeline.
 
-
-
 > **Note** :-
 >
 >If you are not into the `pipelines-tutorial` namespace, and using another namespace for the tutorial steps, please make sure you update the
@@ -339,19 +329,15 @@ frontend and backend image resource to the correct url with your namespace name 
 >
 >`image-registry.openshift-image-registry.svc:5000/<namespace-name>/vote-api:latest`
 
-You can see the list of resources created using `tkn`:
+You need to create the `PersistentVolumeClaim` which can be used for Pipeline execution:
 
 ```bash
-$ tkn resource ls
-
-NAME        TYPE    DETAILS
-api-repo    git     url: http://github.com/openshift-pipelines/vote-api.git
-ui-repo     git     url: http://github.com/openshift-pipelines/vote-ui.git
-api-image   image   url: image-registry.openshift-image-registry.svc:5000/pipelines-tutorial/vote-api:latest
-ui-image    image   url: image-registry.openshift-image-registry.svc:5000/pipelines-tutorial/vote-ui:latest
+$ oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/release-tech-preview-2/01_pipeline/03_persistent_volume_claim.yaml
 ```
 
-A `PipelineRun` is how you can start a pipeline and tie it to the git and image resources that should be used for this specific invocation. You can start the pipeline using `tkn`:
+A `PipelineRun` is how you can start a pipeline and tie it to the persistentVolumeClaim and params that should be used for this specific invocation.
+
+Lets start a pipeline to build and deploy backend application using `tkn`:
 
 ```bash
 $ tkn pipeline start build-and-deploy \
@@ -366,10 +352,12 @@ In order to track the pipelinerun progress run:
 tkn pipelinerun logs build-and-deploy-run-z2rz8 -f -n pipelines-tutorial
 ```
 
+Similarly, start a pipeline to build and deploy frontend application:
+
 ```bash
 $ tkn pipeline start build-and-deploy \
     -w name=shared-workspace,claimName=source-pvc \
-    -p deployment-name=vote-api \
+    -p deployment-name=vote-ui \
     -p git-url=http://github.com/openshift-pipelines/vote-ui.git \
     -p IMAGE=image-registry.openshift-image-registry.svc:5000/pipelines-tutorial/vote-ui \
 
@@ -426,7 +414,7 @@ $ oc get route vote-ui --template='http://{{.spec.host}}'
 ```
 
 
-If you want to re-run the pipeline again, you can use the following short-hand command to rerun the last pipelinerun again that uses the same pipeline resources and service account used in the previous pipeline run:
+If you want to re-run the pipeline again, you can use the following short-hand command to rerun the last pipelinerun again that uses the same workspaces, params and service account used in the previous pipeline run:
 
 ```
 $ tkn pipeline start build-and-deploy --last
@@ -603,7 +591,7 @@ When we perform any push event on the [backend](https://github.com/openshift-pip
 
 1.  The configured webhook in vote-api GitHub repository should push the event payload to our route (exposed EventListener Service).
 
-2. The Event-Listner will pass the event to the TriggerBinding and TriggerTemplate pair.
+2. The Event-Listener will pass the event to the TriggerBinding and TriggerTemplate pair.
 
 3. TriggerBinding will extract parameters needed for rendering the TriggerTemplate.
 Successful rendering of TriggerTemplate should create 2 PipelineResources (source-repo-vote-api and image-source-vote-api) and a PipelineRun (build-deploy-vote-api)
