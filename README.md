@@ -45,7 +45,7 @@ The custom resources needed to define a pipeline are listed below:
 In short, in order to create a pipeline, one does the following:
 * Create custom or install [existing](https://github.com/tektoncd/catalog) reusable `Tasks`
 * Create a `Pipeline` and `PipelineResources` to define your application's delivery pipeline
-* Create a `PersistentVolumeClaim` to provide the volume/filesystem for pipeline execution
+* Create a `PersistentVolumeClaim` to provide the volume/filesystem for pipeline execution or provide a `VolumeClaimTemplate` which creates a `PersistentVolumeClaim`
 * Create a `PipelineRun` to instantiate and invoke the pipeline
 
 For further details on pipeline concepts, refer to the [Tekton documentation](https://github.com/tektoncd/pipeline/tree/master/docs#learn-more) that provides an excellent guide for understanding various parameters and attributes available for defining pipelines.
@@ -329,11 +329,7 @@ frontend and backend image resource to the correct url with your namespace name 
 >
 >`image-registry.openshift-image-registry.svc:5000/<namespace-name>/vote-api:latest`
 
-You need to create the `PersistentVolumeClaim` which can be used for Pipeline execution:
 
-```bash
-$ oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/master/01_pipeline/03_persistent_volume_claim.yaml
-```
 
 A `PipelineRun` is how you can start a pipeline and tie it to the persistentVolumeClaim and params that should be used for this specific invocation.
 
@@ -341,7 +337,7 @@ Lets start a pipeline to build and deploy backend application using `tkn`:
 
 ```bash
 $ tkn pipeline start build-and-deploy \
-    -w name=shared-workspace,claimName=source-pvc \
+    -w name=shared-workspace,volumeClaimTemplateFile=https://raw.githubusercontent.com/openshift/pipelines-tutorial/master/01_pipeline/03_persistent_volume_claim.yaml \
     -p deployment-name=vote-api \
     -p git-url=http://github.com/openshift-pipelines/vote-api.git \
     -p IMAGE=image-registry.openshift-image-registry.svc:5000/pipelines-tutorial/vote-api \
@@ -356,7 +352,7 @@ Similarly, start a pipeline to build and deploy frontend application:
 
 ```bash
 $ tkn pipeline start build-and-deploy \
-    -w name=shared-workspace,claimName=source-pvc \
+    -w name=shared-workspace,volumeClaimTemplateFile=https://raw.githubusercontent.com/openshift/pipelines-tutorial/master/01_pipeline/03_persistent_volume_claim.yaml \
     -p deployment-name=vote-ui \
     -p git-url=http://github.com/openshift-pipelines/vote-ui.git \
     -p IMAGE=image-registry.openshift-image-registry.svc:5000/pipelines-tutorial/vote-ui \
