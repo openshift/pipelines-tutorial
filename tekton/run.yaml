@@ -8,9 +8,9 @@ spec:
     name: pipeline-tutorial-check
   params:
     - name: repo_url
-      value: {{repository.html_url}}
+      value: {{repo_url}}
     - name: revision
-      value: {{pull_request.head.sha}}
+      value: {{revision}}
   workspaces:
   - name: source
     volumeClaimTemplate:
