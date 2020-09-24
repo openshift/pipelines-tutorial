@@ -136,6 +136,7 @@ demo.run() {
   demo.validate_pipelinerun
 }
 
+# TEST TEKTON_ASA_CODE
 demo.validate_pipelinerun() {
   local failed=0
   local results=( $(oc get pipelinerun.tekton.dev -n "$NAMESPACE" --template='
