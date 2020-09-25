@@ -287,7 +287,7 @@ Backend:
 
 Frontend:
 
-  1. Clones the source code of the backend application from a git repository when  (`git-repo` git resource) refered to `ui-repo`
+  1. Clones the source code of the frontend application from a git repository when  (`git-repo` git resource) refered to `ui-repo`
   2. Builds the container image of backend using the `buildah` clustertask
   that uses [Buildah](https://buildah.io/) to build the image
   3. The application image is pushed to an image registry by refering (`image` image resource) to `ui-image`
