@@ -63,10 +63,10 @@ architecture with the following CRDs:
   created (e.g. Create PipelineResources and PipelineRun that uses them)
 - [`TriggerBinding`](https://github.com/tektoncd/triggers/blob/master/docs/triggerbindings.md) - Validates events and extracts
   payload fields
-- [`EventListener`](https://github.com/tektoncd/triggers/blob/master/docs/eventlisteners.md) - Connects `TriggerBindings` and
-  `TriggerTemplates` into an
+- [`Trigger`](https://github.com/tektoncd/triggers/blob/master/docs/triggers.md) - combines TriggerTemplate, TriggerBindings and interceptors.
+- [`EventListener`](https://github.com/tektoncd/triggers/blob/master/docs/eventlisteners.md) -  provides an
   [addressable](https://github.com/knative/eventing/blob/master/docs/spec/interfaces.md)
-  endpoint (the event sink). It uses the extracted event parameters from each
+  endpoint (the event sink). `Trigger` is referenced inside the EventListener Spec. It uses the extracted event parameters from each
   `TriggerBinding` (and any supplied static parameters) to create the resources
   specified in the corresponding `TriggerTemplate`. It also optionally allows an
   external service to pre-process the event payload via the `interceptor` field.
@@ -506,11 +506,37 @@ spec:
 The exact paths (keys) of parameter we need can be found by examining the event payload (eg: GitHub events).
 
 
-Run following command to apply Triggertemplate.
+Run following command to apply TriggerBinding.
 
 ```bash
 $ oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/master/03_triggers/01_binding.yaml
 ```
+
+####  Trigger
+`Trigger` combines TriggerTemplate, TriggerBindings and interceptors. They are used as ref inside the EventListener.
+
+The definition of our Trigger is given in `03-triggers/04_trigger.yaml`.
+
+```yaml
+apiVersion: triggers.tekton.dev/v1alpha1
+kind: Trigger
+metadata:
+  name: vote-trigger
+spec:
+  serviceAccountName: pipeline
+  triggers:
+  - bindings:
+    - ref: vote-app
+    template:
+      name: vote-app
+```
+
+Run following command to apply Trigger.
+
+```bash
+$ oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/master/03_triggers/03_trigger.yaml
+```
+
 
 #### Event Listener
 
@@ -534,10 +560,10 @@ spec:
     template:
       name: vote-app
 ```
-* Run following command to create Triggertemplate.
+* Run following command to create EventListener.
 
 ```bash
-$ oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/master/03_triggers/03_event_listener.yaml
+$ oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/master/03_triggers/04_event_listener.yaml
 ```
 
 >***Note***: EventListener will setup a Service. We need to expose that Service as an OpenShift Route to make it publicly accessible.

@@ -70,10 +70,11 @@ demo.setup-triggers() {
 
   info "Setup Triggers"
   OC apply -f 03_triggers/01_binding.yaml
+  OC apply -f 03_triggers/03_trigger.yaml
   sed -e "s|pipelines-tutorial|$NAMESPACE|g" 03_triggers/02_template.yaml | OC apply -f -
 
   info "Setup Event Listener"
-  OC apply -f 03_triggers/03_event_listener.yaml
+  OC apply -f 03_triggers/04_event_listener.yaml
 
   sleep 3
   info "Expose event listener"
@@ -172,7 +173,7 @@ demo.help() {
 		COMMANDS:
 		  setup             runs both pipeline and trigger setup
 		  setup-pipeline    sets up project, tasks, pipeline and workspace
-		  setup-triggers    sets up  trigger-template, bindings, event-listener, expose webhook url
+		  setup-triggers    sets up  trigger, trigger-template, bindings, event-listener, expose webhook url
 		  run               starts pipeline to deploy api, ui
 		  webhook-url       provides the webhook url, which listens to github-event payloads
 		  logs              shows logs of last pipelinerun
