@@ -1,0 +1,6 @@
+tasks:
+  - git-clone
+  - yaml-lint
+
+files:
+  - pipelinerun.yaml
