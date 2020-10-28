@@ -1,3 +1,6 @@
+owners:
+  - "@openshift-pipelines"
+
 tasks:
   - git-clone
   - yaml-lint
