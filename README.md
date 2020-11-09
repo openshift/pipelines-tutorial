@@ -473,8 +473,13 @@ spec:
         value: image-registry.openshift-image-registry.svc:5000/pipelines-tutorial/$(tt.params.git-repo-name)
       workspaces:
       - name: shared-workspace
-        persistentvolumeclaim:
-          claimName: source-pvc
+        volumeClaimTemplate:
+          spec:
+            accessModes:
+              - ReadWriteOnce
+            resources:
+              requests:
+                storage: 500Mi
 ```
 
 * Run following command to apply Triggertemplate.
