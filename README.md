@@ -253,9 +253,6 @@ spec:
   - name: update-deployment
     taskRef:
       name: update-deployment
-    workspaces:
-    - name: source
-      workspace: shared-workspace
     params:
     - name: deployment
       value: $(params.deployment-name)
