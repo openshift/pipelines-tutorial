@@ -530,7 +530,7 @@ spec:
   - bindings:
     - ref: vote-app
     template:
-      name: vote-app
+      ref: vote-app
 ```
 
 Run following command to apply Trigger.
