@@ -12,7 +12,7 @@ spec:
       default: "k8s"
   steps:
     - name: apply
-      image: quay.io/openshift/origin-cli:latest
+      image: image-registry.openshift-image-registry.svc:5000/openshift/cli:latest
       workingDir: /workspace/source
       command: ["/bin/bash", "-c"]
       args:
