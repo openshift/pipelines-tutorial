@@ -12,7 +12,7 @@ spec:
       type: string
   steps:
     - name: patch
-      image: quay.io/openshift/origin-cli:latest
+      image: image-registry.openshift-image-registry.svc:5000/openshift/cli:latest
       command: ["/bin/bash", "-c"]
       args:
         - |-
