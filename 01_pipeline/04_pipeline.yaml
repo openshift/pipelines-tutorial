@@ -15,7 +15,7 @@ spec:
   - name: git-revision
     type: string
     description: revision to be used from repo of the code for deployment
-    default: "master"
+    default: "pipelines-1.4"
   - name: IMAGE
     type: string
     description: image to be build from the code
@@ -41,8 +41,6 @@ spec:
       name: buildah
       kind: ClusterTask
     params:
-    - name: TLSVERIFY
-      value: "false"
     - name: IMAGE
       value: $(params.IMAGE)
     workspaces:
