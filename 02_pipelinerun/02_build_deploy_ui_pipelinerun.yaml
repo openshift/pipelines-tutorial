@@ -7,7 +7,7 @@ spec:
     name: build-and-deploy
   params:
   - name: deployment-name
-    value: vote-ui
+    value: pipelines-vote-ui
   - name: git-url
     value: https://github.com/openshift/pipelines-vote-ui.git
   - name: IMAGE
