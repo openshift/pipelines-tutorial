@@ -452,7 +452,7 @@ spec:
   - apiVersion: tekton.dev/v1beta1
     kind: PipelineRun
     metadata:
-      name: build-deploy-$(tt.params.git-repo-name)-$(uid)
+      generateName: build-deploy-$(tt.params.git-repo-name)-
     spec:
       serviceAccountName: pipeline
       pipelineRef:
@@ -623,7 +623,7 @@ $ git commit -m "empty-commit" --allow-empty && git push origin pipelines-1.4
 ...
 Writing objects: 100% (1/1), 190 bytes | 190.00 KiB/s, done.
 Total 1 (delta 0), reused 0 (delta 0)
-To github.com:<github-username>/vote-api.git
+To github.com:<github-username>/pipelines-vote-api.git
    72c14bb..97d3115  pipelines-1.4 -> pipelines-1.4
 ```
 
