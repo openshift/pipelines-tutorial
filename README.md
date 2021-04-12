@@ -401,7 +401,7 @@ Looking back at the project, you should see that the images are successfully bui
 You can get the route of the application by executing the following command and access the application
 
 ```bash
-$ oc get route vote-ui --template='http://{{.spec.host}}'
+$ oc get route pipelines-vote-ui --template='http://{{.spec.host}}'
 ```
 
 
