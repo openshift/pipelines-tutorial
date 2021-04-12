@@ -322,7 +322,7 @@ specified in the pipeline.
 >If you are not into the `pipelines-tutorial` namespace, and using another namespace for the tutorial steps, please make sure you update the
 frontend and backend image resource to the correct url with your namespace name like so :
 >
->`image-registry.openshift-image-registry.svc:5000/<namespace-name>/vote-api:latest`
+>`image-registry.openshift-image-registry.svc:5000/<namespace-name>/pipelines-vote-api:latest`
 
 
 
@@ -333,9 +333,9 @@ Lets start a pipeline to build and deploy backend application using `tkn`:
 ```bash
 $ tkn pipeline start build-and-deploy \
     -w name=shared-workspace,volumeClaimTemplateFile=https://raw.githubusercontent.com/openshift/pipelines-tutorial/pipelines-1.4/01_pipeline/03_persistent_volume_claim.yaml \
-    -p deployment-name=vote-api \
+    -p deployment-name=pipelines-vote-api \
     -p git-url=https://github.com/openshift/pipelines-vote-api.git \
-    -p IMAGE=image-registry.openshift-image-registry.svc:5000/pipelines-tutorial/vote-api \
+    -p IMAGE=image-registry.openshift-image-registry.svc:5000/pipelines-tutorial/pipelines-vote-api \
 
 Pipelinerun started: build-and-deploy-run-z2rz8
 
@@ -348,9 +348,9 @@ Similarly, start a pipeline to build and deploy frontend application:
 ```bash
 $ tkn pipeline start build-and-deploy \
     -w name=shared-workspace,volumeClaimTemplateFile=https://raw.githubusercontent.com/openshift/pipelines-tutorial/pipelines-1.4/01_pipeline/03_persistent_volume_claim.yaml \
-    -p deployment-name=vote-ui \
+    -p deployment-name=pipelines-vote-ui \
     -p git-url=https://github.com/openshift/pipelines-vote-ui.git \
-    -p IMAGE=image-registry.openshift-image-registry.svc:5000/pipelines-tutorial/vote-ui \
+    -p IMAGE=image-registry.openshift-image-registry.svc:5000/pipelines-tutorial/pipelines-vote-ui \
 
 Pipelinerun started: build-and-deploy-run-xy7rw
 
@@ -524,11 +524,10 @@ metadata:
   name: vote-trigger
 spec:
   serviceAccountName: pipeline
-  triggers:
-  - bindings:
+  bindings:
     - ref: vote-app
-    template:
-      ref: vote-app
+  template:
+    ref: vote-app
 ```
 
 Run following command to apply Trigger.
