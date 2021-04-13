@@ -41,8 +41,6 @@ spec:
       name: buildah
       kind: ClusterTask
     params:
-    - name: TLSVERIFY
-      value: "false"
     - name: IMAGE
       value: $(params.IMAGE)
     workspaces:
