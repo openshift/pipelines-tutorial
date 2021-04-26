@@ -322,7 +322,7 @@ specified in the pipeline.
 >If you are not into the `pipelines-tutorial` namespace, and using another namespace for the tutorial steps, please make sure you update the
 frontend and backend image resource to the correct url with your namespace name like so :
 >
->`image-registry.openshift-image-registry.svc:5000/<namespace-name>/vote-api:latest`
+>`image-registry.openshift-image-registry.svc:5000/<namespace-name>/pipelines-vote-api:latest`
 
 
 
@@ -333,9 +333,9 @@ Lets start a pipeline to build and deploy backend application using `tkn`:
 ```bash
 $ tkn pipeline start build-and-deploy \
     -w name=shared-workspace,volumeClaimTemplateFile=https://raw.githubusercontent.com/openshift/pipelines-tutorial/master/01_pipeline/03_persistent_volume_claim.yaml \
-    -p deployment-name=vote-api \
+    -p deployment-name=pipelines-vote-api \
     -p git-url=https://github.com/openshift/pipelines-vote-api.git \
-    -p IMAGE=image-registry.openshift-image-registry.svc:5000/pipelines-tutorial/vote-api \
+    -p IMAGE=image-registry.openshift-image-registry.svc:5000/pipelines-tutorial/pipelines-vote-api \
 
 Pipelinerun started: build-and-deploy-run-z2rz8
 
@@ -348,9 +348,9 @@ Similarly, start a pipeline to build and deploy frontend application:
 ```bash
 $ tkn pipeline start build-and-deploy \
     -w name=shared-workspace,volumeClaimTemplateFile=https://raw.githubusercontent.com/openshift/pipelines-tutorial/master/01_pipeline/03_persistent_volume_claim.yaml \
-    -p deployment-name=vote-ui \
+    -p deployment-name=pipelines-vote-ui \
     -p git-url=https://github.com/openshift/pipelines-vote-ui.git \
-    -p IMAGE=image-registry.openshift-image-registry.svc:5000/pipelines-tutorial/vote-ui \
+    -p IMAGE=image-registry.openshift-image-registry.svc:5000/pipelines-tutorial/pipelines-vote-ui \
 
 Pipelinerun started: build-and-deploy-run-xy7rw
 
@@ -401,7 +401,7 @@ Looking back at the project, you should see that the images are successfully bui
 You can get the route of the application by executing the following command and access the application
 
 ```bash
-$ oc get route vote-ui --template='http://{{.spec.host}}'
+$ oc get route pipelines-vote-ui --template='http://{{.spec.host}}'
 ```
 
 
@@ -431,7 +431,7 @@ Now let’s add a TriggerTemplate, TriggerBinding, and an EventListener to our p
 
 A `TriggerTemplate` is a resource which have parameters that can be substituted anywhere within the resources of template.
 
-The definition of our TriggerTemplate is given in `03-triggers/02-template.yaml`.
+The definition of our TriggerTemplate is given in `03_triggers/02-template.yaml`.
 
 ```yaml
 apiVersion: triggers.tekton.dev/v1alpha1
@@ -452,7 +452,7 @@ spec:
   - apiVersion: tekton.dev/v1beta1
     kind: PipelineRun
     metadata:
-      name: build-deploy-$(tt.params.git-repo-name)-$(uid)
+      generateName: build-deploy-$(tt.params.git-repo-name)-
     spec:
       serviceAccountName: pipeline
       pipelineRef:
@@ -487,7 +487,7 @@ $ oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/ma
 ####  Trigger Binding
 TriggerBindings is a map enable you to capture fields from an event and store them as parameters, and replace them in triggerTemplate whenever an event occurs.
 
-The definition of our TriggerBinding is given in `03-triggers/01_binding.yaml`.
+The definition of our TriggerBinding is given in `03_triggers/01_binding.yaml`.
 
 ```yaml
 apiVersion: triggers.tekton.dev/v1alpha1
@@ -515,7 +515,7 @@ $ oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/ma
 ####  Trigger
 `Trigger` combines TriggerTemplate, TriggerBindings and interceptors. They are used as ref inside the EventListener.
 
-The definition of our Trigger is given in `03-triggers/04_trigger.yaml`.
+The definition of our Trigger is given in `03_triggers/03_trigger.yaml`.
 
 ```yaml
 apiVersion: triggers.tekton.dev/v1alpha1
@@ -524,11 +524,10 @@ metadata:
   name: vote-trigger
 spec:
   serviceAccountName: pipeline
-  triggers:
-  - bindings:
+  bindings:
     - ref: vote-app
-    template:
-      ref: vote-app
+  template:
+    ref: vote-app
 ```
 
 Run following command to apply Trigger.
@@ -545,7 +544,7 @@ This component sets up a Service and listens for events. It also connects a Trig
 endpoint (the event sink)
 
 The definition for our EventListener can be found in
-`03-triggers/03_event_listener.yaml`.
+`03_triggers/04_event_listener.yaml`.
 
 ```yaml
 apiVersion: triggers.tekton.dev/v1alpha1
@@ -555,10 +554,7 @@ metadata:
 spec:
   serviceAccountName: pipeline
   triggers:
-  - bindings:
-    - name: vote-app
-    template:
-      name: vote-app
+    - triggerRef: vote-trigger
 ```
 * Run following command to create EventListener.
 
@@ -626,7 +622,7 @@ $ git commit -m "empty-commit" --allow-empty && git push origin master
 ...
 Writing objects: 100% (1/1), 190 bytes | 190.00 KiB/s, done.
 Total 1 (delta 0), reused 0 (delta 0)
-To github.com:<github-username>/vote-api.git
+To github.com:<github-username>/pipelines-vote-api.git
    72c14bb..97d3115  master -> master
 ```
 
