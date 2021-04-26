@@ -120,17 +120,17 @@ demo.run() {
   info "Running API Build and deploy"
   TKN pipeline start build-and-deploy \
     -w name=shared-workspace,volumeClaimTemplateFile=01_pipeline/03_persistent_volume_claim.yaml \
-    -p deployment-name=vote-api \
+    -p deployment-name=pipelines-vote-api \
     -p git-url=https://github.com/openshift/pipelines-vote-api.git \
-    -p IMAGE=image-registry.openshift-image-registry.svc:5000/pipelines-tutorial/vote-api \
+    -p IMAGE=image-registry.openshift-image-registry.svc:5000/pipelines-tutorial/pipelines-vote-api \
     --showlog=true
 
   info "Running UI Build and deploy"
   TKN pipeline start build-and-deploy \
     -w name=shared-workspace,volumeClaimTemplateFile=01_pipeline/03_persistent_volume_claim.yaml \
-    -p deployment-name=vote-ui \
+    -p deployment-name=pipelines-vote-ui \
     -p git-url=https://github.com/openshift/pipelines-vote-ui.git \
-    -p IMAGE=image-registry.openshift-image-registry.svc:5000/pipelines-tutorial/vote-ui \
+    -p IMAGE=image-registry.openshift-image-registry.svc:5000/pipelines-tutorial/pipelines-vote-ui \
     --showlog=true
 
   info "Validating the result of pipeline run"
@@ -159,7 +159,7 @@ demo.validate_pipelinerun() {
 
 demo.url() {
   echo "Click following URL to access the application"
-  oc -n "$NAMESPACE" get route vote-ui --template='http://{{.spec.host}} '
+  oc -n "$NAMESPACE" get route pipelines-vote-ui --template='http://{{.spec.host}} '
   echo
 }
 
