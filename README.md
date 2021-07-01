@@ -524,12 +524,32 @@ metadata:
   name: vote-trigger
 spec:
   serviceAccountName: pipeline
+  interceptors:
+    - ref:
+        name: "github"
+      params:
+        - name: "secretRef"
+          value:
+            secretName: github-secret
+            secretKey: secretToken
+        - name: "eventTypes"
+          value: ["push"]
   bindings:
     - ref: vote-app
   template:
     ref: vote-app
 ```
-
+The secret is to verify events are coming from correct source code management
+```yaml
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: github-secret
+type: Opaque
+stringData:
+  secretToken: "1234567"
+```
 Run following command to apply Trigger.
 
 ```bash
