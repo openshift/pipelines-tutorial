@@ -123,6 +123,7 @@ demo.run() {
     -p deployment-name=pipelines-vote-api \
     -p git-url=https://github.com/openshift/pipelines-vote-api.git \
     -p IMAGE=image-registry.openshift-image-registry.svc:5000/pipelines-tutorial/pipelines-vote-api \
+    --use-param-defaults \
     --showlog=true
 
   info "Running UI Build and deploy"
@@ -131,6 +132,7 @@ demo.run() {
     -p deployment-name=pipelines-vote-ui \
     -p git-url=https://github.com/openshift/pipelines-vote-ui.git \
     -p IMAGE=image-registry.openshift-image-registry.svc:5000/pipelines-tutorial/pipelines-vote-ui \
+    --use-param-defaults \
     --showlog=true
 
   info "Validating the result of pipeline run"
