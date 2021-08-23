@@ -437,7 +437,7 @@ A `TriggerTemplate` is a resource which have parameters that can be substituted 
 The definition of our TriggerTemplate is given in `03_triggers/02-template.yaml`.
 
 ```yaml
-apiVersion: triggers.tekton.dev/v1alpha1
+apiVersion: triggers.tekton.dev/v1beta1
 kind: TriggerTemplate
 metadata:
   name: vote-app
@@ -493,7 +493,7 @@ TriggerBindings is a map enable you to capture fields from an event and store th
 The definition of our TriggerBinding is given in `03_triggers/01_binding.yaml`.
 
 ```yaml
-apiVersion: triggers.tekton.dev/v1alpha1
+apiVersion: triggers.tekton.dev/v1beta1
 kind: TriggerBinding
 metadata:
   name: vote-app
@@ -521,7 +521,7 @@ $ oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/ma
 The definition of our Trigger is given in `03_triggers/03_trigger.yaml`.
 
 ```yaml
-apiVersion: triggers.tekton.dev/v1alpha1
+apiVersion: triggers.tekton.dev/v1beta1
 kind: Trigger
 metadata:
   name: vote-trigger
@@ -570,7 +570,7 @@ The definition for our EventListener can be found in
 `03_triggers/04_event_listener.yaml`.
 
 ```yaml
-apiVersion: triggers.tekton.dev/v1alpha1
+apiVersion: triggers.tekton.dev/v1beta1
 kind: EventListener
 metadata:
   name: vote-app
