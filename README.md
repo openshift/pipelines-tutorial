@@ -48,36 +48,36 @@ In short, in order to create a pipeline, one does the following:
 * Create a `PersistentVolumeClaim` to provide the volume/filesystem for pipeline execution or provide a `VolumeClaimTemplate` which creates a `PersistentVolumeClaim`
 * Create a `PipelineRun` to instantiate and invoke the pipeline
 
-For further details on pipeline concepts, refer to the [Tekton documentation](https://github.com/tektoncd/pipeline/tree/master/docs#learn-more) that provides an excellent guide for understanding various parameters and attributes available for defining pipelines.
+For further details on pipeline concepts, refer to the [Tekton documentation](https://github.com/tektoncd/pipeline/tree/main/docs#learn-more) that provides an excellent guide for understanding various parameters and attributes available for defining pipelines.
 
 The Tekton API enables functionality to be separated from configuration (e.g.
-[Pipelines](https://github.com/tektoncd/pipeline/blob/master/docs/pipelines.md)
+[Pipelines](https://github.com/tektoncd/pipeline/blob/main/docs/pipelines.md)
 vs
-[PipelineRuns](https://github.com/tektoncd/pipeline/blob/master/docs/pipelineruns.md))
+[PipelineRuns](https://github.com/tektoncd/pipeline/blob/main/docs/pipelineruns.md))
 such that steps can be reusable.
 
 Triggers extends the Tekton
 architecture with the following CRDs:
 
-- [`TriggerTemplate`](https://github.com/tektoncd/triggers/blob/master/docs/triggertemplates.md) - Templates resources to be
+- [`TriggerTemplate`](https://github.com/tektoncd/triggers/blob/main/docs/triggertemplates.md) - Templates resources to be
   created (e.g. Create PipelineResources and PipelineRun that uses them)
-- [`TriggerBinding`](https://github.com/tektoncd/triggers/blob/master/docs/triggerbindings.md) - Validates events and extracts
+- [`TriggerBinding`](https://github.com/tektoncd/triggers/blob/main/docs/triggerbindings.md) - Validates events and extracts
   payload fields
-- [`Trigger`](https://github.com/tektoncd/triggers/blob/master/docs/triggers.md) - combines TriggerTemplate, TriggerBindings and interceptors.
-- [`EventListener`](https://github.com/tektoncd/triggers/blob/master/docs/eventlisteners.md) -  provides an
-  [addressable](https://github.com/knative/eventing/blob/master/docs/spec/interfaces.md)
+- [`Trigger`](https://github.com/tektoncd/triggers/blob/main/docs/triggers.md) - combines TriggerTemplate, TriggerBindings and interceptors.
+- [`EventListener`](https://github.com/tektoncd/triggers/blob/main/docs/eventlisteners.md) -  provides an
+  [addressable](https://github.com/knative/eventing/blob/main/docs/spec/interfaces.md)
   endpoint (the event sink). `Trigger` is referenced inside the EventListener Spec. It uses the extracted event parameters from each
   `TriggerBinding` (and any supplied static parameters) to create the resources
   specified in the corresponding `TriggerTemplate`. It also optionally allows an
   external service to pre-process the event payload via the `interceptor` field.
-- [`ClusterTriggerBinding`](https://github.com/tektoncd/triggers/blob/master/docs/clustertriggerbindings.md) - A cluster-scoped
+- [`ClusterTriggerBinding`](https://github.com/tektoncd/triggers/blob/main/docs/clustertriggerbindings.md) - A cluster-scoped
   TriggerBinding
 
 Using `tektoncd/triggers` in conjunction with `tektoncd/pipeline` enables you to
 easily create full-fledged CI/CD systems where the execution is defined
 **entirely** through Kubernetes resources.
 
-You can learn more about `triggers` by checking out the [docs](https://github.com/tektoncd/triggers/blob/master/docs/README.md)
+You can learn more about `triggers` by checking out the [docs](https://github.com/tektoncd/triggers/blob/main/docs/README.md)
 
 In the following sections, you will go through each of the above steps to define and invoke a pipeline.
 
@@ -152,9 +152,9 @@ Note that only the requirement for a git repository is declared on the task and 
 Install the `apply-manifests` and `update-deployment` tasks from the repository using `oc` or `kubectl`, which you will need for creating a pipeline in the next section:
 
 ```bash
-$ oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/master/01_pipeline/01_apply_manifest_task.yaml
+$ oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/pipelines-1.6/01_pipeline/01_apply_manifest_task.yaml
 
-$ oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/master/01_pipeline/02_update_deployment_task.yaml
+$ oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/pipelines-1.6/01_pipeline/02_update_deployment_task.yaml
 ```
 
 You can take a look at the tasks you created using the [Tekton CLI](https://github.com/tektoncd/cli/releases):
@@ -207,7 +207,7 @@ spec:
   - name: git-revision
     type: string
     description: revision to be used from repo of the code for deployment
-    default: "master"
+    default: "pipelines-1.6"
   - name: IMAGE
     type: string
     description: image to be build from the code
@@ -289,7 +289,7 @@ The execution order of task is determined by dependencies that are defined betwe
 Create the pipeline by running the following:
 
 ```bash
-$ oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/master/01_pipeline/04_pipeline.yaml
+$ oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/pipelines-1.6/01_pipeline/04_pipeline.yaml
 ```
 
 Alternatively, in the OpenShift Web Console, you can click on the **+** at the top right of the screen while you are in the **pipelines-tutorial** project:
@@ -332,7 +332,7 @@ Lets start a pipeline to build and deploy backend application using `tkn`:
 
 ```bash
 $ tkn pipeline start build-and-deploy \
-    -w name=shared-workspace,volumeClaimTemplateFile=https://raw.githubusercontent.com/openshift/pipelines-tutorial/master/01_pipeline/03_persistent_volume_claim.yaml \
+    -w name=shared-workspace,volumeClaimTemplateFile=https://raw.githubusercontent.com/openshift/pipelines-tutorial/pipelines-1.6/01_pipeline/03_persistent_volume_claim.yaml \
     -p deployment-name=pipelines-vote-api \
     -p git-url=https://github.com/openshift/pipelines-vote-api.git \
     -p IMAGE=image-registry.openshift-image-registry.svc:5000/pipelines-tutorial/pipelines-vote-api \
@@ -349,7 +349,7 @@ Similarly, start a pipeline to build and deploy frontend application:
 
 ```bash
 $ tkn pipeline start build-and-deploy \
-    -w name=shared-workspace,volumeClaimTemplateFile=https://raw.githubusercontent.com/openshift/pipelines-tutorial/master/01_pipeline/03_persistent_volume_claim.yaml \
+    -w name=shared-workspace,volumeClaimTemplateFile=https://raw.githubusercontent.com/openshift/pipelines-tutorial/pipelines-1.6/01_pipeline/03_persistent_volume_claim.yaml \
     -p deployment-name=pipelines-vote-ui \
     -p git-url=https://github.com/openshift/pipelines-vote-ui.git \
     -p IMAGE=image-registry.openshift-image-registry.svc:5000/pipelines-tutorial/pipelines-vote-ui \
@@ -447,7 +447,7 @@ spec:
     description: The git repository url
   - name: git-revision
     description: The git revision
-    default: master
+    default: pipelines-1.6
   - name: git-repo-name
     description: The name of the deployment to be created / patched
 
@@ -483,7 +483,7 @@ spec:
 * Run following command to apply Triggertemplate.
 
 ```bash
-$ oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/master/03_triggers/02_template.yaml
+$ oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/pipelines-1.6/03_triggers/02_template.yaml
 ```
 
 
@@ -512,7 +512,7 @@ The exact paths (keys) of parameter we need can be found by examining the event 
 Run following command to apply TriggerBinding.
 
 ```bash
-$ oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/master/03_triggers/01_binding.yaml
+$ oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/pipelines-1.6/03_triggers/01_binding.yaml
 ```
 
 ####  Trigger
@@ -556,14 +556,14 @@ stringData:
 Run following command to apply Trigger.
 
 ```bash
-$ oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/master/03_triggers/03_trigger.yaml
+$ oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/pipelines-1.6/03_triggers/03_trigger.yaml
 ```
 
 
 #### Event Listener
 
 This component sets up a Service and listens for events. It also connects a TriggerTemplate to a TriggerBinding, into an
-[addressable](https://github.com/knative/eventing/blob/master/docs/spec/interfaces.md)
+[addressable](https://github.com/knative/eventing/blob/main/docs/spec/interfaces.md)
 endpoint (the event sink)
 
 The definition for our EventListener can be found in
@@ -582,7 +582,7 @@ spec:
 * Run following command to create EventListener.
 
 ```bash
-$ oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/master/03_triggers/04_event_listener.yaml
+$ oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/pipelines-1.6/03_triggers/04_event_listener.yaml
 ```
 
 >***Note***: EventListener will setup a Service. We need to expose that Service as an OpenShift Route to make it publicly accessible.
@@ -641,12 +641,12 @@ We can test this by pushing a commit to vote-api repository from GitHub web ui o
 
 Let’s push an empty commit to vote-api repository.
 ```bash
-$ git commit -m "empty-commit" --allow-empty && git push origin master
+$ git commit -m "empty-commit" --allow-empty && git push origin pipelines-1.6
 ...
 Writing objects: 100% (1/1), 190 bytes | 190.00 KiB/s, done.
 Total 1 (delta 0), reused 0 (delta 0)
 To github.com:<github-username>/pipelines-vote-api.git
-   72c14bb..97d3115  master -> master
+   72c14bb..97d3115  pipelines-1.6 -> pipelines-1.6
 ```
 
 Watch OpenShift WebConsole Developer perspective and a PipelineRun will be automatically created.
