@@ -1,4 +1,4 @@
-apiVersion: tekton.dev/v1beta1
+apiVersion: appconnect.ibm.com/v1beta1
 kind: Task
 metadata:
   name: apply-manifests
