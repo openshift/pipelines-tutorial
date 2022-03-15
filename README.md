@@ -162,9 +162,9 @@ You can take a look at the tasks you created using the [Tekton CLI](https://gith
 ```
 $ tkn task ls
 
-NAME                AGE
-apply-manifests     10 seconds ago
-update-deployment   4 seconds ago
+NAME                DESCRIPTION   AGE
+apply-manifests                   1 minute ago
+update-deployment                 7 seconds ago
 ```
 
 We will be using `buildah` clusterTasks, which gets installed along with Operator. Operator installs few ClusterTask which you can see.
