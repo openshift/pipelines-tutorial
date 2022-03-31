@@ -122,7 +122,7 @@ demo.run() {
     -w name=shared-workspace,volumeClaimTemplateFile=01_pipeline/03_persistent_volume_claim.yaml \
     -p deployment-name=pipelines-vote-api \
     -p git-url=https://github.com/openshift/pipelines-vote-api.git \
-    -p IMAGE=image-registry.openshift-image-registry.svc:5000/pipelines-tutorial/pipelines-vote-api \
+    -p IMAGE="image-registry.openshift-image-registry.svc:5000/${NAMESPACE}/pipelines-vote-api" \
     --use-param-defaults \
     --showlog=true
 
@@ -131,7 +131,7 @@ demo.run() {
     -w name=shared-workspace,volumeClaimTemplateFile=01_pipeline/03_persistent_volume_claim.yaml \
     -p deployment-name=pipelines-vote-ui \
     -p git-url=https://github.com/openshift/pipelines-vote-ui.git \
-    -p IMAGE=image-registry.openshift-image-registry.svc:5000/pipelines-tutorial/pipelines-vote-ui \
+    -p IMAGE="image-registry.openshift-image-registry.svc:5000/${NAMESPACE}/pipelines-vote-ui" \
     --use-param-defaults \
     --showlog=true
 
