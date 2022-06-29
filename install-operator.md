@@ -28,6 +28,6 @@ After clicking **Subscribe**, you will be taken to the **Installed Operators** p
 
 That's all. The operator now installs OpenShift Pipelines on the cluster.
 
-You can confirm the following by checking tekton-pipelines and tekton-triggers pods with `Running` state in `openshift-pipelines` namespace. If so, openshift-pielines have been installed on your cluster.
+You can confirm the following by checking tekton-pipelines and tekton-triggers pods with `Running` state in `openshift-pipelines` namespace. If so, openshift-pipelines have been installed on your cluster.
 
 ![OpenShift Pipelines Operator 4](docs/images/operator-install-4.png)
