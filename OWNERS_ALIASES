@@ -6,6 +6,7 @@ aliases:
   - sthaha
   - vdemeester
   - piyush-garg
+  - sm43
 
   pipeline-tutorial-reviewers:
   - chmouel
@@ -14,5 +15,6 @@ aliases:
   - nikhil-thomas
   - piyush-garg
   - siamaksade
+  - sm43
   - sthaha
   - vdemeester
