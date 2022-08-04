@@ -207,7 +207,7 @@ spec:
   - name: git-revision
     type: string
     description: revision to be used from repo of the code for deployment
-    default: pipelines-1.8
+    default: master
   - name: IMAGE
     type: string
     description: image to be build from the code
@@ -447,7 +447,7 @@ spec:
     description: The git repository url
   - name: git-revision
     description: The git revision
-    default: pipelines-1.8
+    default: master
   - name: git-repo-name
     description: The name of the deployment to be created / patched
 
