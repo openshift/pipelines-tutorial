@@ -8,7 +8,7 @@ spec:
     description: The git repository url
   - name: git-revision
     description: The git revision
-    default: master
+    default: pipelines-1.12
   - name: git-repo-name
     description: The name of the deployment to be created / patched
 
