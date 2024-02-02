@@ -56,7 +56,7 @@ vs
 [PipelineRuns](https://github.com/tektoncd/pipeline/blob/master/docs/pipelineruns.md))
 such that steps can be reusable.
 
-Triggers extends the Tekton
+Triggers extend the Tekton
 architecture with the following CRDs:
 
 - [`TriggerTemplate`](https://github.com/tektoncd/triggers/blob/master/docs/triggertemplates.md) - Templates resources to be
@@ -129,7 +129,7 @@ Tasks consist of a number of steps that are executed sequentially. Tasks are exe
 Here is an example of a Maven task for building a Maven-based Java application:
 
 ```yaml
-apiVersion: tekton.dev/v1beta1
+apiVersion: tekton.dev/v1
 kind: Task
 metadata:
   name: maven-build
@@ -190,7 +190,7 @@ In this tutorial, you will create a pipeline that takes the source code of the a
 Here is the YAML file that represents the above pipeline:
 
 ```yaml
-apiVersion: tekton.dev/v1beta1
+apiVersion: tekton.dev/v1
 kind: Pipeline
 metadata:
   name: build-and-deploy
@@ -259,7 +259,7 @@ spec:
     runAfter:
     - apply-manifests
 ```
-Once you deploy the pipelines, you should be able to visualize pipeline flow  in the OpenShift Web Console by switching over to the **Developer** perspective of the OpenShift Web Console. select pipeline tab, select project as `pipelines-tutorial` and click on pipeline `build-and-deploy`
+Once you deploy the pipelines, you should be able to visualize pipeline flow in the OpenShift Web Console by switching over to the **Developer** perspective of the OpenShift Web Console. Select pipeline tab, select project as `pipelines-tutorial` and click on pipeline `build-and-deploy`
 
 ![Pipeline-view](docs/images/pipeline-view.png)
 
@@ -282,9 +282,9 @@ pipeline, you can provide different git repositories and image registries to be
 used during pipeline execution. Be patient! You will do that in a little bit in
 the next section.
 
-The execution order of task is determined by dependencies that are defined between the tasks via inputs and outputs as well as explicit orders that are defined via `runAfter`.
+The execution order of tasks is determined by dependencies that are defined between the tasks via inputs and outputs as well as explicit orders that are defined via `runAfter`.
 
-`workspaces` field allow you to specify one or more volumes that each Task in the Pipeline requires during execution. You specify one or more Workspaces in the `workspaces` field.
+`workspaces` field allows you to specify one or more volumes that each Task in the Pipeline requires during execution. You specify one or more Workspaces in the `workspaces` field.
 
 Create the pipeline by running the following:
 
@@ -327,11 +327,12 @@ frontend and backend image resource to the correct url with your namespace name 
 
 
 A `PipelineRun` is how you can start a pipeline and tie it to the persistentVolumeClaim and params that should be used for this specific invocation.
-
-Lets start a pipeline to build and deploy backend application using `tkn`:
+ 
+Let's start a pipeline to build and deploy the backend application using `tkn`:
 
 ```bash
 $ tkn pipeline start build-and-deploy \
+    --prefix-name build-deploy-api-pipelinerun \
     -w name=shared-workspace,volumeClaimTemplateFile=https://raw.githubusercontent.com/openshift/pipelines-tutorial/master/01_pipeline/03_persistent_volume_claim.yaml \
     -p deployment-name=pipelines-vote-api \
     -p git-url=https://github.com/openshift/pipelines-vote-api.git \
@@ -339,42 +340,43 @@ $ tkn pipeline start build-and-deploy \
     --use-param-defaults
 
 
-Pipelinerun started: build-and-deploy-run-z2rz8
+Pipelinerun started: vote-api-t9tpq
 
 In order to track the pipelinerun progress run:
-tkn pipelinerun logs build-and-deploy-run-z2rz8 -f -n pipelines-tutorial
+tkn pipelinerun logs vote-api-t9tpq -f -n pipelines-tutorial
 ```
 
-Similarly, start a pipeline to build and deploy frontend application:
+Similarly, start a pipeline to build and deploy the frontend application:
 
 ```bash
 $ tkn pipeline start build-and-deploy \
+    --prefix-name build-deploy-ui-pipelinerun \
     -w name=shared-workspace,volumeClaimTemplateFile=https://raw.githubusercontent.com/openshift/pipelines-tutorial/master/01_pipeline/03_persistent_volume_claim.yaml \
     -p deployment-name=pipelines-vote-ui \
     -p git-url=https://github.com/openshift/pipelines-vote-ui.git \
     -p IMAGE=image-registry.openshift-image-registry.svc:5000/pipelines-tutorial/pipelines-vote-ui \
     --use-param-defaults
 
-Pipelinerun started: build-and-deploy-run-xy7rw
+PipelineRun started: vote-ui-9tb2q
 
-In order to track the pipelinerun progress run:
-tkn pipelinerun logs build-and-deploy-run-xy7rw -f -n pipelines-tutorial
+In order to track the PipelineRun progress run:
+tkn pipelinerun logs vote-ui-9tb2q -f -n pipelines-tutorial
 ```
 As soon as you start the `build-and-deploy` pipeline, a pipelinerun will be instantiated and pods will be created to execute the tasks that are defined in the pipeline.
 
 ```bash
 $ tkn pipeline list
-NAME               AGE             LAST RUN                     STARTED          DURATION   STATUS
-build-and-deploy   6 minutes ago   build-and-deploy-run-xy7rw   36 seconds ago   ---        Running
+NAME               AGE              LAST RUN        STARTED          DURATION   STATUS
+build-and-deploy   10 minutes ago   vote-ui-9tb2q   47 seconds ago   ---        Running
 ```
 
-Above we have started `build-and-deploy` pipeline, with relevant pipeline resources to deploy backend/frontend application using single pipeline
+Above we have started `build-and-deploy` pipeline, with relevant pipeline resources to deploy the backend/frontend applications using single pipeline
 
 ```bash
 $ tkn pipelinerun ls
-NAME                         STARTED         DURATION     STATUS
-build-and-deploy-run-xy7rw   36 seconds ago   ---          Running
-build-and-deploy-run-z2rz8   40 seconds ago   ---          Running
+NAME             STARTED         DURATION   STATUS
+vote-ui-9tb2q    1 minute ago    ---        Running
+vote-api-t9tpq   1 minute ago    ---        Running
 ```
 
 
@@ -383,18 +385,17 @@ Check out the logs of the pipelinerun as it runs using the `tkn pipeline logs` c
 ```
 $ tkn pipeline logs -f
 ? Select pipelinerun:  [Use arrows to move, type to filter]
-> build-and-deploy-run-xy7rw started 36 seconds ago
-  build-and-deploy-run-z2rz8 started 40 seconds ago
+> vote-ui-9tb2q started 3 minutes ago
+  vote-api-t9tpq started 7 minutes ago
 ```
 
 After a few minutes, the pipeline should finish successfully.
 
 ```bash
 $ tkn pipelinerun list
-
-NAME                         STARTED      DURATION     STATUS
-build-and-deploy-run-xy7rw   1 hour ago   2 minutes    Succeeded
-build-and-deploy-run-z2rz8   1 hour ago   19 minutes   Succeeded
+NAME             STARTED         DURATION   STATUS
+vote-ui-9tb2q    1 minute ago    1m23s      Succeeded
+vote-api-t9tpq   5 minutes ago   1m31s      Succeeded
 ```
 
 Looking back at the project, you should see that the images are successfully built and deployed.
@@ -414,15 +415,14 @@ If you want to re-run the pipeline again, you can use the following short-hand c
 $ tkn pipeline start build-and-deploy --last
 ```
 
-Whenever there is any change to your repository we need to start pipeline explicity to see new changes to take effect
+Whenever there is any change to your repository we need to start the pipeline explicitly to see new changes take effect.
 
 # Triggers
-
-Triggers in conjuntion with pipelines enable us to hook our Pipelines to respond to external github events (push events, pull requests etc).
+Triggers in conjunction with pipelines enable us to hook our Pipelines to respond to external GitHub events (push events, pull requests etc).
 
 ## Prerequisites
 
-You need an latest OpenShift 4 cluster running on AWS in order to complete this tutorial. If you don't have an existing cluster, go to http://try.openshift.com and register for free in order to get an OpenShift 4 cluster up and running on AWS within minutes.
+You need an OpenShift 4 cluster running on AWS, Azure or onprem in order to complete this tutorial. If you don't have an existing cluster, go to http://try.openshift.com and register for free in order to get an OpenShift 4 cluster up and running on AWS within minutes.
 
 >***NOTE:*** Running cluster localy [crc](https://github.com/code-ready/crc/releases) won't work, as we need `webhook-url` to be accessable to `github-repos`
 
@@ -432,7 +432,7 @@ Now let’s add a TriggerTemplate, TriggerBinding, and an EventListener to our p
 
 ####  Trigger Template
 
-A `TriggerTemplate` is a resource which have parameters that can be substituted anywhere within the resources of template.
+A `TriggerTemplate` is a resource that has parameters that can be substituted anywhere within the resources of a template.
 
 The definition of our TriggerTemplate is given in `03_triggers/02-template.yaml`.
 
@@ -450,7 +450,6 @@ spec:
     default: master
   - name: git-repo-name
     description: The name of the deployment to be created / patched
-
   resourcetemplates:
   - apiVersion: tekton.dev/v1beta1
     kind: PipelineRun
@@ -480,7 +479,7 @@ spec:
                 storage: 500Mi
 ```
 
-* Run following command to apply Triggertemplate.
+Run the following command to apply Triggertemplate.
 
 ```bash
 $ oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/master/03_triggers/02_template.yaml
@@ -506,10 +505,10 @@ spec:
   - name: git-revision
     value: $(body.head_commit.id)
 ```
-The exact paths (keys) of parameter we need can be found by examining the event payload (eg: GitHub events).
+The exact paths (keys) of the parameters we need can be found by examining the event payload (eg: GitHub events).
 
 
-Run following command to apply TriggerBinding.
+Run the following command to apply TriggerBinding.
 
 ```bash
 $ oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/master/03_triggers/01_binding.yaml
@@ -542,7 +541,8 @@ spec:
   template:
     ref: vote-app
 ```
-The secret is to verify events are coming from correct source code management
+The secret is to verify events are coming from the correct source code management.
+
 ```yaml
 ---
 apiVersion: v1
@@ -553,7 +553,7 @@ type: Opaque
 stringData:
   secretToken: "1234567"
 ```
-Run following command to apply Trigger.
+Run the following command to apply Trigger.
 
 ```bash
 $ oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/master/03_triggers/03_trigger.yaml
@@ -579,7 +579,7 @@ spec:
   triggers:
     - triggerRef: vote-trigger
 ```
-* Run following command to create EventListener.
+* Run the following command to create EventListener.
 
 ```bash
 $ oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/master/03_triggers/04_event_listener.yaml
@@ -587,7 +587,7 @@ $ oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/ma
 
 >***Note***: EventListener will setup a Service. We need to expose that Service as an OpenShift Route to make it publicly accessible.
 
-* Run below command to expose eventlistener service as a route
+* Run the below command to expose the EventListener service as a route
 
 ```bash
 $ oc expose svc el-vote-app
@@ -595,9 +595,10 @@ $ oc expose svc el-vote-app
 
 ## Configuring GitHub WebHooks
 
-Now we need to configure webhook-url on [backend](https://github.com/openshift/pipelines-vote-api) and [frontend](https://github.com/openshift/pipelines-vote-ui) source code repositories with the Route we exposed in the previously.
+Now we need to configure webhook-url on [backend](https://github.com/openshift/pipelines-vote-api) and [frontend](https://github.com/openshift/pipelines-vote-ui) source code repositories with the Route we exposed previously.
 
-* Run below command to get webhook-url
+* Run the below command to get webhook-url
+
 ```bash
 $ echo "URL: $(oc  get route el-vote-app --template='http://{{.spec.host}}')"
 ```
@@ -608,8 +609,8 @@ $ echo "URL: $(oc  get route el-vote-app --template='http://{{.spec.host}}')"
 
 ### Configure webhook manually
 
-Open forked github repo (Go to Settings > Webhook)
-click on `Add Webhook` > Add
+Open the forked GitHub repo (Go to Settings > Webhook).
+Click on `Add Webhook` > Add
 ```bash
 $ echo "$(oc  get route el-vote-app --template='http://{{.spec.host}}')"
 ```
@@ -617,7 +618,7 @@ to payload URL > Select Content type as `application/json` > Add secret eg: `123
 
 ![Add webhook](docs/images/add-webhook.png)
 
-- Follow above procedure to configure webhook on [frontend](https://github.com/openshift/pipelines-vote-ui) repo
+- Follow the above procedure to configure the webhook on [frontend](https://github.com/openshift/pipelines-vote-ui) repo
 
 Now we should see a webhook configured on your forked source code repositories (on our
 GitHub Repo, go to Settings>Webhooks).
@@ -637,7 +638,7 @@ When we perform any push event on the [backend](https://github.com/openshift/pip
 3. TriggerBinding will extract parameters needed for rendering the TriggerTemplate.
 Successful rendering of TriggerTemplate should create 2 PipelineResources (source-repo-vote-api and image-source-vote-api) and a PipelineRun (build-deploy-vote-api)
 
-We can test this by pushing a commit to vote-api repository from GitHub web ui or from terminal.
+We can test this by pushing a commit to vote-api repository from GitHub web ui or from the terminal.
 
 Let’s push an empty commit to vote-api repository.
 ```bash
@@ -649,7 +650,7 @@ To github.com:<github-username>/pipelines-vote-api.git
    72c14bb..97d3115  master -> master
 ```
 
-Watch OpenShift WebConsole Developer perspective and a PipelineRun will be automatically created.
+Watch the OpenShift WebConsole Developer perspective and a PipelineRun will be automatically created.
 
 ![pipeline-run-api](docs/images/pipeline-run-api.png
 )
