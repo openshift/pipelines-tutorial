@@ -450,13 +450,15 @@ spec:
     default: master
   - name: git-repo-name
     description: The name of the deployment to be created / patched
+
   resourcetemplates:
-  - apiVersion: tekton.dev/v1beta1
+  - apiVersion: tekton.dev/v1
     kind: PipelineRun
     metadata:
       generateName: build-deploy-$(tt.params.git-repo-name)-
     spec:
-      serviceAccountName: pipeline
+      taskRunTemplate:
+        serviceAccountName: pipeline
       pipelineRef:
         name: build-and-deploy
       params:
@@ -467,7 +469,7 @@ spec:
       - name: git-revision
         value: $(tt.params.git-revision)
       - name: IMAGE
-        value: image-registry.openshift-image-registry.svc:5000/pipelines-tutorial/$(tt.params.git-repo-name)
+        value: image-registry.openshift-image-registry.svc:5000/$(context.pipelineRun.namespace)/$(tt.params.git-repo-name)
       workspaces:
       - name: shared-workspace
         volumeClaimTemplate:
