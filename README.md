@@ -207,7 +207,7 @@ spec:
   - name: git-revision
     type: string
     description: revision to be used from repo of the code for deployment
-    default: master
+    default: pipelines-1.15
   - name: IMAGE
     type: string
     description: image to be build from the code
@@ -289,7 +289,7 @@ The execution order of tasks is determined by dependencies that are defined betw
 Create the pipeline by running the following:
 
 ```bash
-$ oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/pipelines-1.15/01_pipeline/04_pipeline.yaml
+$ oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/pipelines-1.15/01_pipeline/04_pipeline.yaml 
 ```
 
 Alternatively, in the OpenShift Web Console, you can click on the **+** at the top right of the screen while you are in the **pipelines-tutorial** project:
@@ -447,7 +447,7 @@ spec:
     description: The git repository url
   - name: git-revision
     description: The git revision
-    default: master
+    default: pipelines-1.15
   - name: git-repo-name
     description: The name of the deployment to be created / patched
 
@@ -644,12 +644,12 @@ We can test this by pushing a commit to vote-api repository from GitHub web ui o
 
 Let’s push an empty commit to vote-api repository.
 ```bash
-$ git commit -m "empty-commit" --allow-empty && git push origin master
+$ git commit -m "empty-commit" --allow-empty && git push origin pipelines-1.15
 ...
 Writing objects: 100% (1/1), 190 bytes | 190.00 KiB/s, done.
 Total 1 (delta 0), reused 0 (delta 0)
 To github.com:<github-username>/pipelines-vote-api.git
-   72c14bb..97d3115  master -> master
+   72c14bb..97d3115  pipelines-1.15 -> pipelines-1.15
 ```
 
 Watch the OpenShift WebConsole Developer perspective and a PipelineRun will be automatically created.
