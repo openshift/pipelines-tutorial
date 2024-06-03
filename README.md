@@ -484,7 +484,7 @@ spec:
 Run the following command to apply Triggertemplate.
 
 ```bash
-$ oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/pipelines-1.15/03_triggers/03_trigger.yaml
+$ oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/pipelines-1.15/03_triggers/02_template.yaml
 ```
 
 
