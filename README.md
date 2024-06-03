@@ -104,7 +104,7 @@ Run the following command to see the `pipeline` service account:
 $ oc get serviceaccount pipeline
 ```
 
-You will use the simple application during this tutorial, which has a [frontend](https://github.com/openshift/pipelines-vote-ui) and [backend](https://github.com/openshift/pipelines-vote-api)
+You will use the simple application during this tutorial, which has a [frontend](https://github.com/openshift/pipelines-vote-ui/tree/pipelines-1.15) and [backend](https://github.com/openshift/pipelines-vote-api/tree/pipelines-1.15)
 
 You can also deploy the same applications by applying the artifacts available in k8s directory of the respective repo
 
@@ -152,9 +152,9 @@ Note that only the requirement for a git repository is declared on the task and 
 Install the `apply-manifests` and `update-deployment` tasks from the repository using `oc` or `kubectl`, which you will need for creating a pipeline in the next section:
 
 ```bash
-$ oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/master/01_pipeline/01_apply_manifest_task.yaml
+$ oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/pipelines-1.15/01_pipeline/01_apply_manifest_task.yaml
 
-$ oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/master/01_pipeline/02_update_deployment_task.yaml
+$ oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/pipelines-1.15/01_pipeline/02_update_deployment_task.yaml
 ```
 
 You can take a look at the tasks you created using the [Tekton CLI](https://github.com/tektoncd/cli/releases):
@@ -207,7 +207,7 @@ spec:
   - name: git-revision
     type: string
     description: revision to be used from repo of the code for deployment
-    default: master
+    default: pipelines-1.15
   - name: IMAGE
     type: string
     description: image to be build from the code
@@ -289,7 +289,7 @@ The execution order of tasks is determined by dependencies that are defined betw
 Create the pipeline by running the following:
 
 ```bash
-$ oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/master/01_pipeline/04_pipeline.yaml
+$ oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/pipelines-1.15/01_pipeline/04_pipeline.yaml 
 ```
 
 Alternatively, in the OpenShift Web Console, you can click on the **+** at the top right of the screen while you are in the **pipelines-tutorial** project:
@@ -333,7 +333,7 @@ Let's start a pipeline to build and deploy the backend application using `tkn`:
 ```bash
 $ tkn pipeline start build-and-deploy \
     --prefix-name build-deploy-api-pipelinerun \
-    -w name=shared-workspace,volumeClaimTemplateFile=https://raw.githubusercontent.com/openshift/pipelines-tutorial/master/01_pipeline/03_persistent_volume_claim.yaml \
+    -w name=shared-workspace,volumeClaimTemplateFile=https://raw.githubusercontent.com/openshift/pipelines-tutorial/pipelines-1.15/01_pipeline/03_persistent_volume_claim.yaml \
     -p deployment-name=pipelines-vote-api \
     -p git-url=https://github.com/openshift/pipelines-vote-api.git \
     -p IMAGE=image-registry.openshift-image-registry.svc:5000/pipelines-tutorial/pipelines-vote-api \
@@ -351,7 +351,7 @@ Similarly, start a pipeline to build and deploy the frontend application:
 ```bash
 $ tkn pipeline start build-and-deploy \
     --prefix-name build-deploy-ui-pipelinerun \
-    -w name=shared-workspace,volumeClaimTemplateFile=https://raw.githubusercontent.com/openshift/pipelines-tutorial/master/01_pipeline/03_persistent_volume_claim.yaml \
+    -w name=shared-workspace,volumeClaimTemplateFile=https://raw.githubusercontent.com/openshift/pipelines-tutorial/pipelines-1.15/01_pipeline/03_persistent_volume_claim.yaml \
     -p deployment-name=pipelines-vote-ui \
     -p git-url=https://github.com/openshift/pipelines-vote-ui.git \
     -p IMAGE=image-registry.openshift-image-registry.svc:5000/pipelines-tutorial/pipelines-vote-ui \
@@ -447,7 +447,7 @@ spec:
     description: The git repository url
   - name: git-revision
     description: The git revision
-    default: master
+    default: pipelines-1.15
   - name: git-repo-name
     description: The name of the deployment to be created / patched
 
@@ -484,7 +484,7 @@ spec:
 Run the following command to apply Triggertemplate.
 
 ```bash
-$ oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/master/03_triggers/02_template.yaml
+$ oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/pipelines-1.15/03_triggers/02_template.yaml
 ```
 
 
@@ -513,7 +513,7 @@ The exact paths (keys) of the parameters we need can be found by examining the e
 Run the following command to apply TriggerBinding.
 
 ```bash
-$ oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/master/03_triggers/01_binding.yaml
+$ oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/pipelines-1.15/03_triggers/01_binding.yaml
 ```
 
 ####  Trigger
@@ -558,7 +558,7 @@ stringData:
 Run the following command to apply Trigger.
 
 ```bash
-$ oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/master/03_triggers/03_trigger.yaml
+$ oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/pipelines-1.15/03_triggers/03_trigger.yaml
 ```
 
 
@@ -584,7 +584,7 @@ spec:
 * Run the following command to create EventListener.
 
 ```bash
-$ oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/master/03_triggers/04_event_listener.yaml
+$ oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/pipelines-1.15/03_triggers/04_event_listener.yaml
 ```
 
 >***Note***: EventListener will setup a Service. We need to expose that Service as an OpenShift Route to make it publicly accessible.
@@ -597,7 +597,7 @@ $ oc expose svc el-vote-app
 
 ## Configuring GitHub WebHooks
 
-Now we need to configure webhook-url on [backend](https://github.com/openshift/pipelines-vote-api) and [frontend](https://github.com/openshift/pipelines-vote-ui) source code repositories with the Route we exposed previously.
+Now we need to configure webhook-url on [backend](https://github.com/openshift/pipelines-vote-api/tree/pipelines-1.15) and [frontend](https://github.com/openshift/pipelines-vote-ui/tree/pipelines-1.15) source code repositories with the Route we exposed previously.
 
 * Run the below command to get webhook-url
 
@@ -607,7 +607,7 @@ $ echo "URL: $(oc  get route el-vote-app --template='http://{{.spec.host}}')"
 
 >***Note:***
 >
->Fork the [backend](https://github.com/openshift/pipelines-vote-api) and [frontend](https://github.com/openshift/pipelines-vote-ui) source code repositories so that you have sufficient privileges to configure GitHub webhooks.
+>Fork the [backend](https://github.com/openshift/pipelines-vote-api/tree/pipelines-1.15) and [frontend](https://github.com/openshift/pipelines-vote-ui/tree/pipelines-1.15) source code repositories so that you have sufficient privileges to configure GitHub webhooks.
 
 ### Configure webhook manually
 
@@ -620,7 +620,7 @@ to payload URL > Select Content type as `application/json` > Add secret eg: `123
 
 ![Add webhook](docs/images/add-webhook.png)
 
-- Follow the above procedure to configure the webhook on [frontend](https://github.com/openshift/pipelines-vote-ui) repo
+- Follow the above procedure to configure the webhook on [frontend](https://github.com/openshift/pipelines-vote-ui/tree/pipelines-1.15) repo
 
 Now we should see a webhook configured on your forked source code repositories (on our
 GitHub Repo, go to Settings>Webhooks).
@@ -631,7 +631,7 @@ GitHub Repo, go to Settings>Webhooks).
 
 #### Trigger pipeline Run
 
-When we perform any push event on the [backend](https://github.com/openshift/pipelines-vote-api) the following should happen.
+When we perform any push event on the [backend](https://github.com/openshift/pipelines-vote-api/tree/pipelines-1.15) the following should happen.
 
 1.  The configured webhook in vote-api GitHub repository should push the event payload to our route (exposed EventListener Service).
 
@@ -644,15 +644,14 @@ We can test this by pushing a commit to vote-api repository from GitHub web ui o
 
 Let’s push an empty commit to vote-api repository.
 ```bash
-$ git commit -m "empty-commit" --allow-empty && git push origin master
+$ git commit -m "empty-commit" --allow-empty && git push origin pipelines-1.15
 ...
 Writing objects: 100% (1/1), 190 bytes | 190.00 KiB/s, done.
 Total 1 (delta 0), reused 0 (delta 0)
 To github.com:<github-username>/pipelines-vote-api.git
-   72c14bb..97d3115  master -> master
+   72c14bb..97d3115  pipelines-1.15 -> pipelines-1.15
 ```
 
 Watch the OpenShift WebConsole Developer perspective and a PipelineRun will be automatically created.
 
-![pipeline-run-api](docs/images/pipeline-run-api.png
-)
+![pipeline-run-api](docs/images/pipeline-run-api.png)
