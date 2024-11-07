@@ -135,7 +135,7 @@ metadata:
   name: maven-build
 spec:
   workspaces:
-   -name: filedrop
+   - name: filedrop
   steps:
   - name: build
     image: maven:3.6.0-jdk-8-slim
