@@ -15,7 +15,7 @@ spec:
   - name: git-revision
     type: string
     description: revision to be used from repo of the code for deployment
-    default: master
+    default: pipelines-1.17
   - name: IMAGE
     type: string
     description: image to be build from the code
