@@ -167,16 +167,16 @@ apply-manifests     10 seconds ago
 update-deployment   4 seconds ago
 ```
 
-We will be using `buildah` clusterTasks, which gets installed along with Operator. Operator installs few ClusterTask which you can see.
+We will be using `buildah` task, which gets installed along with Operator. Operator installs few tasks in namespace `openshift-pipelines` which you can see.
 
 ```bash
-$ tkn clustertasks ls
-NAME                       DESCRIPTION   AGE
-buildah                                  1 day ago
-buildah-v0-14-3                          1 day ago
-git-clone                                1 day ago
-s2i-php                                  1 day ago
-tkn                                      1 day ago
+$ tkn tasks ls -n openshift-pipelines
+NAME                      DESCRIPTION              AGE
+buildah                   Buildah task builds...   1 day ago
+git-cli                   This task can be us...   1 day ago
+git-clone                 This object represe...   1 day ago
+maven                     This Task can be us...   1 day ago
+...
 ```
 
 ## Create Pipeline
@@ -214,24 +214,36 @@ spec:
   tasks:
   - name: fetch-repository
     taskRef:
-      name: git-clone
-      kind: ClusterTask
+      resolver: cluster
+      params:
+      - name: kind
+        value: task
+      - name: name
+        value: git-clone
+      - name: namespace
+        value: openshift-pipelines
     workspaces:
     - name: output
       workspace: shared-workspace
     params:
-    - name: url
+    - name: URL
       value: $(params.git-url)
-    - name: subdirectory
+    - name: SUBDIRECTORY
       value: ""
-    - name: deleteExisting
+    - name: DELETE_EXISTING
       value: "true"
-    - name: revision
+    - name: REVISION
       value: $(params.git-revision)
   - name: build-image
     taskRef:
-      name: buildah
-      kind: ClusterTask
+      resolver: cluster
+      params:
+      - name: kind
+        value: task
+      - name: name
+        value: buildah
+      - name: namespace
+        value: openshift-pipelines
     params:
     - name: IMAGE
       value: $(params.IMAGE)
@@ -268,7 +280,7 @@ This pipeline helps you to build and deploy backend/frontend, by configuring rig
 Pipeline Steps:
 
   1. Clones the source code of the application from a git repository by referring (`git-url` and `git-revision` param)
-  2. Builds the container image of application using the `buildah` clustertask
+  2. Builds the container image of application using the `buildah` task
   that uses [Buildah](https://buildah.io/) to build the image
   3. The application image is pushed to an image registry by refering (`image` param)
   4. The new application image is deployed on OpenShift using the `apply-manifests` and `update-deployment` tasks.
