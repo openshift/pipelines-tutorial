@@ -1,0 +1,28 @@
+Create a private key.
+  openssl genrsa -des3 -out ISDEV.key 2048
+  enter the passphrase for your easy remembrance
+ 
+Create a certificate signing request (CSR).
+  openssl req -new -key ISDEV.key -out ISDEV.csr
+  Fill all the details and enter the passphrase entered above
+ 
+Sign the CSR yourself and create a certificate.(This is a self signed certificate so you need to sign it yourself and in real world example you need to send it to CA to sign)
+
+openssl x509 -req -days 365 -in ISDEV.csr -signkey ISDEV.key -out ISDEV.crt
+ enter the details and passphrase
+ 
+Integration server understands DER format so convert the crt received from CA to DER format
+
+openssl x509 -in ISDEV.crt -inform PEM -out ISDEV.crt -outform DER
+
+If you want to create a new keystore create one this is the recommended approach and not sure the default keystore. You can use the default keystore for Dev servers not recommended for prod
+
+openssl pkcs12 -export -des3 -in ISDEV.crt -inkey ISDEV.key -out ISDEV.pkcs12
+
+to view all the certificates created in unix run it as ls -l in windows use dir
+
+Install the certificate in Integration Server
+
+Install the keystore via Security - Keystore - Create Keystore Alias on IS’s web frontend.
+
+create all the details mentioned in that screen and once saved you should be able to see the keystore in enabled format
