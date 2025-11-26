@@ -104,7 +104,7 @@ Run the following command to see the `pipeline` service account:
 $ oc get serviceaccount pipeline
 ```
 
-You will use the simple application during this tutorial, which has a [frontend](https://github.com/openshift/pipelines-vote-ui) and [backend](https://github.com/openshift/pipelines-vote-api)
+You will use the simple application during this tutorial, which has a [frontend](https://github.com/openshift/pipelines-vote-ui/tree/pipelines-1.20) and [backend](https://github.com/openshift/pipelines-vote-api/tree/pipelines-1.20)
 
 You can also deploy the same applications by applying the artifacts available in k8s directory of the respective repo
 
